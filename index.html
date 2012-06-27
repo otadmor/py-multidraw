@@ -15,6 +15,8 @@ function undo () {
 
 }
 
+var deltime = 100;
+
 var selected_color = "000000";
 
 var last_index = 0;
@@ -26,13 +28,12 @@ new_last_index = d[1];
 lines_count = d[2];
 var painter = document.getElementById("painter");
 var ctx = painter.getContext("2d");
-if (lines_count < lines_painted) {
-ctx.fillStyle="#FFFFFF";
-ctx.fillRect(0,0,painter.width,painter.height);
+
+if (last_index + lines_painted > new_last_index + lines_count)
+{
 ctx.clearRect(0, 0, painter.width, painter.height);
-//ctx.beginPath();
-lines_painted = lines_count;
-}
+last_index = 0;lines_painted=0;read_lines();return;}
+else
 last_index = new_last_index;
 
 lines = d[0];
@@ -75,8 +76,17 @@ var end_y =0;
 function moveline(e)
 {
 
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+ctx.clearRect(Math.min(start_x, end_x) - 5, Math.min(start_y, end_y) - 5, Math.max(start_x, end_x) + 5, Math.max(start_y, end_y) + 5);
 end_x = e.offsetX;
 end_y = e.offsetY;
+ctx.beginPath();
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+ctx.lineTo(end_x, end_y);
+ctx.stroke();
+ctx.closePath();
 }
 
 function endline()
@@ -89,8 +99,13 @@ ctx.moveTo(start_x, start_y);
 ctx.lineTo(end_x, end_y);
 ctx.stroke();
 ctx.closePath();
-
 painter.onmousemove = null;
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+ctx.clearRect(0, 0, painter.width, painter.height);
+
+
+
   $.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color}).done(done_read_lines);
 }
 
@@ -98,13 +113,18 @@ $(document).ready(function() {
 //  var timer = $.timer(read_lines, 1000);
   $("#clean").click(clean);
   $("#undo").click(undo);
-window.setTimeout("read_lines()", 1000);
+window.setTimeout("read_lines()", deltime);
 // timer.play();
 var painter = document.getElementById("painter");
 painter.width = screen.width;
 painter.height = screen.height;
 painter.onmousedown = startline;
 painter.onmouseup = endline;
+
+var painter = document.getElementById("fore_painter");
+painter.width = screen.width;
+painter.height = screen.height;
+
 
 
 $.fn.disableSelection = function() {
@@ -151,12 +171,16 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 
 <body>
 
-<input id="clean" value="clean" type="button"/>
-<input id="undo" value="undo" type="button"/>
-<span id='MyDemoColorPicker1' ></span>
-<canvas width="100%" height="100%" id="painter">
+
+<canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; right: 0; background-color: transparent;">
+</canvas>
+<canvas width="100%" height="100%" id="painter" style="position: absolute; left: 0; right: 0; background-color: transparent;">
+
 
 </canvas>
+<input id="clean" value="clean" type="button" style="position: relative; left: 0; right: 0; "/>
+<input id="undo" value="undo" type="button" style="position: relative; left: 0; right: 0;"/>
+<span id='MyDemoColorPicker1'  style="position: relative; left: 0; right: 0; background-color: transparent;"></span>
 
 </body>
 </html>
