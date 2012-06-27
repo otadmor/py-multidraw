@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>just draw</title>
+<script type="text/javascript" src="jquery.min.js"></script>
+
+<script type="text/javascript">
+
+
+function clean () {
+  $.ajax({url:"/clean"});
+
+}
+function undo () {
+  $.ajax({url:"/undo"});
+
+}
+
+var last_index = 0;
+var lines_painted = 0;
+function done_read_lines(data)
+{
+d = $.parseJSON(data);
+new_last_index = d[1];
+lines_count = d[2];
+var painter = document.getElementById("painter");
+var ctx = painter.getContext("2d");
+if (lines_count < lines_painted) {
+ctx.fillStyle="#FFFFFF";
+ctx.fillRect(0,0,painter.width,painter.height);
+ctx.clearRect(0, 0, painter.width, painter.height);
+ctx.beginPath();
+lines_painted = lines_count;
+}
+last_index = new_last_index;
+
+lines = d[0];
+for (line in lines)
+{
+lines_painted += 1;
+var l = lines[line];
+ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
+ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+ctx.stroke();
+}
+
+window.setTimeout("read_lines()", 1000);
+}
+
+function read_lines() {
+  $.ajax({url:"/" + last_index}).done(done_read_lines);
+
+
+}
+
+var start_x = 0;
+var start_y = 0;
+var painter = document.getElementById("painter");
+function startline(e)
+{
+start_x = e.offsetX;
+start_y = e.offsetY;
+var painter = document.getElementById("painter");
+painter.onmousemove = moveline;
+}
+
+var end_x = 0;
+var end_y =0;
+function moveline(e)
+{
+end_x = e.offsetX;
+end_y = e.offsetY;
+}
+
+function endline()
+{
+var painter = document.getElementById("painter");
+painter.onmousemove = null;
+  $.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y}).done(done_read_lines);
+}
+
+$(document).ready(function() {
+//  var timer = $.timer(read_lines, 1000);
+  $("#clean").click(clean);
+  $("#undo").click(undo);
+window.setTimeout("read_lines()", 1000);
+// timer.play();
+var painter = document.getElementById("painter");
+painter.width = screen.width;
+painter.height = screen.height;
+painter.onmousedown = startline;
+painter.onmouseup = endline;
+
+
+$.fn.disableSelection = function() {
+    return this.each(function() {           
+        $(this).attr('unselectable', 'on')
+               .css({
+                   '-moz-user-select':'none',
+                   '-webkit-user-select':'none',
+                   'user-select':'none',
+                   '-ms-user-select':'none'
+               })
+               .each(function() {
+                   this.onselectstart = function() { return false; };
+               });
+    });
+};
+});
+
+</script>
+
+<style>
+canvas {
+cursor:crosshair;
+}
+/* dont select text */
+* {-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: -moz-none; -o-user-select: none; user-select: none; }
+
+
+</style>
+
+</head>
+
+<body>
+
+<input id="clean" value="clean" type="button"/>
+<input id="undo" value="undo" type="button"/>
+
+<canvas width="100%" height="100%" id="painter">
+
+</canvas>
+
+</body>
+</html>
