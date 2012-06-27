@@ -2,7 +2,7 @@
 <head>
 <title>just draw</title>
 <script type="text/javascript" src="jquery.min.js"></script>
-
+<script type='text/javascript' src='http://wanderinghorse.net/computing/javascript/jquery/colorpicker/sgbeal-colorpicker.jquery.js'>/* colorpicker code */</script>
 <script type="text/javascript">
 
 
@@ -14,6 +14,8 @@ function undo () {
   $.ajax({url:"/undo"});
 
 }
+
+var selected_color = "000000";
 
 var last_index = 0;
 var lines_painted = 0;
@@ -28,7 +30,7 @@ if (lines_count < lines_painted) {
 ctx.fillStyle="#FFFFFF";
 ctx.fillRect(0,0,painter.width,painter.height);
 ctx.clearRect(0, 0, painter.width, painter.height);
-ctx.beginPath();
+//ctx.beginPath();
 lines_painted = lines_count;
 }
 last_index = new_last_index;
@@ -37,17 +39,21 @@ lines = d[0];
 for (line in lines)
 {
 lines_painted += 1;
+
 var l = lines[line];
+ctx.beginPath();
+ctx.strokeStyle="#" + l[4];
 ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
 ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
 ctx.stroke();
+ctx.closePath();
 }
 
 window.setTimeout("read_lines()", 1000);
 }
 
 function read_lines() {
-  $.ajax({url:"/" + last_index}).done(done_read_lines);
+  $.ajax({url:"/" + (last_index + lines_painted)}).done(done_read_lines);
 
 
 }
@@ -55,10 +61,11 @@ function read_lines() {
 var start_x = 0;
 var start_y = 0;
 var painter = document.getElementById("painter");
+var cur_line = null;
 function startline(e)
 {
-start_x = e.offsetX;
-start_y = e.offsetY;
+end_x = start_x = e.offsetX;
+end_y = start_y = e.offsetY;
 var painter = document.getElementById("painter");
 painter.onmousemove = moveline;
 }
@@ -67,6 +74,7 @@ var end_x = 0;
 var end_y =0;
 function moveline(e)
 {
+
 end_x = e.offsetX;
 end_y = e.offsetY;
 }
@@ -74,8 +82,16 @@ end_y = e.offsetY;
 function endline()
 {
 var painter = document.getElementById("painter");
+var ctx = painter.getContext("2d");
+ctx.beginPath();
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+ctx.lineTo(end_x, end_y);
+ctx.stroke();
+ctx.closePath();
+
 painter.onmousemove = null;
-  $.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y}).done(done_read_lines);
+  $.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color}).done(done_read_lines);
 }
 
 $(document).ready(function() {
@@ -105,8 +121,19 @@ $.fn.disableSelection = function() {
                });
     });
 };
+
+
+$('#MyDemoColorPicker1').empty().addColorPicker({
+    clickCallback: function(c) {
+        selected_color = colorToHex(c);
+    }
 });
 
+});
+function colorToHex(c) {
+var m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c);
+return m ? (1 << 24 | m[1] << 16 | m[2] << 8 | m[3]).toString(16).substr(1) : c;
+}
 </script>
 
 <style>
@@ -115,8 +142,9 @@ cursor:crosshair;
 }
 /* dont select text */
 * {-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: -moz-none; -o-user-select: none; user-select: none; }
+input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -moz-text; -o-user-select: text; user-select: text; }
 
-
+.ColorBlotch { width: 20px;padding: 5px;}
 </style>
 
 </head>
@@ -125,7 +153,7 @@ cursor:crosshair;
 
 <input id="clean" value="clean" type="button"/>
 <input id="undo" value="undo" type="button"/>
-
+<span id='MyDemoColorPicker1' ></span>
 <canvas width="100%" height="100%" id="painter">
 
 </canvas>

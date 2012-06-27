@@ -1,6 +1,6 @@
 from BaseHTTPServer import HTTPServer
 from CGIHTTPServer import CGIHTTPRequestHandler
-
+import pickle
 #static_page = open("index.html", "rt").read()
 #jquery_page = open("jquery.min.js", "rt").read()
 lines = []
@@ -23,10 +23,10 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 lines_index = 0
                 ind = 0
             self.myheaders()
-            self.wfile.write(repr([lines[ind - lines_index:], lines_index, len(lines)]))
+            self.wfile.write(repr([lines[ind - lines_index:], lines_index, len(lines)]).replace("'", '"'))
         except ValueError:
             if self.path.startswith('/add'):
-                coords = [int(a) for a in self.path[len('/add/'):].split('/')]
+                coords = [a for a in self.path[len('/add/'):].split('/')]
                 lines.append(coords)
                 self.myheaders()
                 self.wfile.write("")
@@ -54,8 +54,17 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
         
 
 def start_server(port):
+    global lines
+    try:
+        lines = pickle.load(open('objects.pkl', "rb"))
+    except:
+        lines = []
+        
     server = HTTPServer(('', port), CompGeoRequestHandler)
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except:
+        pickle.dump(lines, open('objects.pkl', 'wb'))
 
 
 
