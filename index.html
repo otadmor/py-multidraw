@@ -1,0 +1,233 @@
+<html>
+<head>
+<title>just draw</title>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type='text/javascript' src='http://wanderinghorse.net/computing/javascript/jquery/colorpicker/sgbeal-colorpicker.jquery.js'>/* colorpicker code */</script>
+<script type="text/javascript">
+
+
+function clean () {
+  $.ajax({url:"/clean"});
+
+}
+function undo () {
+  $.ajax({url:"/undo"});
+
+}
+
+var deltime = 100;
+var draw_deltime = 30;
+
+var selected_color = "000000";
+var funqueue = [];
+var last_index = 0;
+var lines_painted = 0;
+function done_read_lines(data)
+{
+d = $.parseJSON(data);
+new_last_index = d[1];
+lines_count = d[2];
+
+if (last_index + lines_painted > new_last_index + lines_count)
+{
+
+funqueue.push(null);
+last_index = 0;lines_painted=0;read_lines();return;}
+else
+last_index = new_last_index;
+
+lines = d[0];
+for (line in lines)
+{
+lines_painted += 1;
+
+var l = lines[line];
+funqueue.push(l);
+
+}
+
+window.setTimeout("read_lines()", deltime);
+}
+
+function clear_all(painter, ctx)
+{
+ctx.clearRect(0, 0, painter.width, painter.height);
+}
+
+function draw_line(l, painter, ctx)
+{
+ctx.beginPath();
+ctx.strokeStyle="#" + l[4];
+ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
+ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+ctx.stroke();
+ctx.closePath();
+}
+
+
+function draw_lines()
+{
+var painter = document.getElementById("painter");
+var ctx = painter.getContext("2d");
+
+while (funqueue.length > 0) {
+    d = funqueue.shift();
+    if (d == null)clear_all(painter, ctx);
+    else draw_line(d, painter, ctx);   
+}
+window.setTimeout("draw_lines()", draw_deltime);
+}
+
+function read_lines() {
+  $.ajax({url:"/" + (last_index + lines_painted)}).done(done_read_lines);
+
+
+}
+
+var start_x = 0;
+var start_y = 0;
+var painter = document.getElementById("painter");
+var cur_line = null;
+function startline(e)
+{
+end_x = start_x = e.offsetX;
+end_y = start_y = e.offsetY;
+var painter = document.getElementById("painter");
+var cont = $("#cont").attr('checked');
+if (cont)
+{
+var painter = document.getElementById("painter");
+var ctx = painter.getContext("2d");
+
+/*ctx.beginPath();
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+*/
+}
+painter.onmousemove = moveline;
+}
+
+var end_x = 0;
+var end_y =0;
+function moveline(e)
+{
+var cont = $("#cont").attr('checked');
+if (!cont)
+{
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+ctx.clearRect(Math.min(start_x, end_x) - 5, Math.min(start_y, end_y) - 5, Math.max(start_x, end_x) + 5, Math.max(start_y, end_y) + 5);
+end_x = e.offsetX;
+end_y = e.offsetY;
+
+ctx.beginPath();
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+ctx.lineTo(end_x, end_y);
+ctx.stroke();
+ctx.closePath();
+}
+else
+{
+
+
+/*var painter = document.getElementById("painter");
+var ctx = painter.getContext("2d");*/
+start_x = end_x;
+start_y = end_y;
+end_x = e.offsetX;
+end_y = e.offsetY;
+funqueue.push([start_x, start_y, end_x, end_y, selected_color]);
+/*ctx.lineTo(end_x, end_y);
+ctx.stroke();
+*/
+$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color});
+}
+}
+
+function endline()
+{
+var painter = document.getElementById("painter");
+painter.onmousemove = null;
+var ctx = painter.getContext("2d");
+var cont = $("#cont").attr('checked');
+if (!cont) {
+funqueue.push([start_x, start_y, end_x, end_y, selected_color]);
+/*ctx.beginPath();
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+ctx.lineTo(end_x, end_y);
+ctx.stroke();
+ctx.closePath();
+*/
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+ctx.clearRect(0, 0, painter.width, painter.height);
+$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color});
+}else ctx.closePath();
+
+
+  
+}
+
+$(document).ready(function() {
+//  var timer = $.timer(read_lines, 1000);
+  $("#clean").click(clean);
+  $("#undo").click(undo);
+// timer.play();
+var painter = document.getElementById("painter");
+painter.width = screen.width;
+painter.height = screen.height;
+painter.onmousedown = startline;
+painter.onmouseup = endline;
+
+var painter = document.getElementById("fore_painter");
+painter.width = screen.width;
+painter.height = screen.height;
+
+
+
+$('#MyDemoColorPicker1').empty().addColorPicker({
+    clickCallback: function(c) {
+        selected_color = colorToHex(c);
+    }
+});
+window.setTimeout("read_lines()", deltime);
+window.setTimeout("draw_lines()", draw_deltime);
+
+});
+function colorToHex(c) {
+var m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c);
+return m ? (1 << 24 | m[1] << 16 | m[2] << 8 | m[3]).toString(16).substr(1) : c;
+}
+</script>
+
+<style>
+canvas {
+cursor:crosshair;
+}
+/* dont select text */
+* {-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: -moz-none; -o-user-select: none; user-select: none; }
+input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -moz-text; -o-user-select: text; user-select: text; }
+
+.ColorBlotch { width: 20px;padding: 5px;}
+</style>
+
+</head>
+
+<body>
+
+
+<canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; right: 0; background-color: transparent;">
+</canvas>
+<canvas width="100%" height="100%" id="painter" style="position: absolute; left: 0; right: 0; background-color: transparent;">
+
+
+</canvas>
+<input id="clean" value="clean" type="button" style="position: relative; left: 0; right: 0; "/>
+<input id="undo" value="undo" type="button" style="position: relative; left: 0; right: 0;"/>
+<input id="cont" value="continuous" checked="checked" type="checkbox" style="position: relative; left: 0; right: 0;"/>
+<span id='MyDemoColorPicker1'  style="position: relative; left: 0; right: 0; background-color: transparent;"></span>
+
+</body>
+</html>
