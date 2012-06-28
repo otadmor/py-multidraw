@@ -35,6 +35,10 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 lines = []
                 self.myheaders()
                 self.wfile.write("")
+            elif self.path.startswith('/save'):
+                pickle.dump(lines, open('objects.pkl', 'wb'))
+                self.myheaders()
+                self.wfile.write("")
             elif self.path.startswith('/undo'):
                 #lines_index -= 1
                 del lines[len(lines) - 1]
