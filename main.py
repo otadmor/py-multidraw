@@ -5,6 +5,8 @@ import pickle
 #jquery_page = open("jquery.min.js", "rt").read()
 lines = []
 lines_index = 0
+
+allowed_files = ["jquery.min.js", "jquery.ui.core.js", "jquery.ui.widget.js", "jquery.ui.mouse.js", "jquery.ui.slider.js",]
     
 class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def myheaders(self):
@@ -44,12 +46,14 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 #self.wfile.write(static_page)
                 self.myheaders()
                 self.wfile.write(open("index.html", "rt").read())
-            elif self.path == '/jquery.min.js':
+            elif self.path[1:] in allowed_files:
                 #self.wfile.write(jquery_page)
-                self.send_response(200)
-                self.send_header('Content-type', 'application/javascript')
-                self.end_headers()
-                self.wfile.write(open("jquery.min.js", "rt").read())
+                
+                if self.path.endswith('.js'):
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/javascript')
+                    self.end_headers()
+                    self.wfile.write(open(self.path[1:], "rt").read())
 
         
 
