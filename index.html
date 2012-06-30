@@ -3,242 +3,38 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <title>just draw</title>
-<!--<script type='text/javascript' src="jquery.min.js"></script>-->
+
 <script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script type='text/javascript' src="http://wanderinghorse.net/computing/javascript/jquery/colorpicker/sgbeal-colorpicker.jquery.js">/* colorpicker code */</script>
-<!--<script type='text/javascript' src="http://cdn.jquerytools.org/1.2.6/jquery.tools.min.js"></script>
-<script type='text/javascript' src="http://cdn.refreshless.com/js/cufon.kozuka.js"></script>
-<script type='text/javascript' src="http://cdn.refreshless.com/js/rfl.v1.0.js"></script>
--->
 
 
 <script type='text/javascript'  src="http://cdn.refreshless.com/noUiSlider/1.3.1/jquery.nouislider.min.js"></script>
 
-<!--<script src="http://refreshless.com/jquery.nouislider.min.js">-->
-<!--<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js'></script>-->
-<!--<link rel="stylesheet" href="http://jqueryui.com/ui/themes/base/jquery.ui.all.css">
-<script type='text/javascript' src="jquery.ui.core.js"></script>
-<script type='text/javascript' src="jquery.ui.widget.js"></script>
-<script type='text/javascript' src="jquery.ui.mouse.js"></script>
-<script type='text/javascript' src="jquery.ui.slider.js"></script>-->
+<script type='text/javascript'  src="multidraw.js"></script>
+
 <script type="text/javascript">
 
 
-function clean () {
-  $.ajax({url:"/clean"});
-
-}
-function undo () {
-  $.ajax({url:"/undo"});
-
-}
-
-var deltime = 100;
-var draw_deltime = 30;
-
-var selected_color = "000000";
-var selected_size = 1;
-var funqueue = [];
-var last_index = 0;
-var lines_painted = 0;
-function done_read_lines(data)
-{
-d = $.parseJSON(data);
-new_last_index = d[1];
-lines_count = d[2];
-
-if (last_index + lines_painted > new_last_index + lines_count)
-{
-
-funqueue.push(null);
-last_index = 0;lines_painted=0;read_lines();return;}
-else
-last_index = new_last_index;
-
-lines = d[0];
-for (line in lines)
-{
-lines_painted += 1;
-
-var l = lines[line];
-funqueue.push(l);
-
-}
-
-window.setTimeout("read_lines()", deltime);
-}
-
-function clear_all(painter, ctx)
-{
-ctx.clearRect(0, 0, painter.width, painter.height);
-}
-
-var opened = false;
-
-function draw_line(l, painter, ctx)
-{
-
-ctx.beginPath();
-ctx.lineWidth = l[5];
-ctx.strokeStyle="#" + l[4];
-ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
-ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
-ctx.stroke();
-ctx.closePath();
-}
-
-
-function draw_lines()
-{
-var painter = document.getElementById("painter");
-var ctx = painter.getContext("2d");
-
-while (funqueue.length > 0) {
-    d = funqueue.shift();
-    if (d == null)clear_all(painter, ctx);
-    else draw_line(d, painter, ctx);   
-}
-window.setTimeout("draw_lines()", draw_deltime);
-}
-
-function read_lines() {
-  $.ajax({url:"/" + (last_index + lines_painted)}).done(done_read_lines);
-
-
-}
-
-var start_x = 0;
-var start_y = 0;
-var painter = document.getElementById("painter");
-var cur_line = null;
-function startline(e)
-{
-if (navigator.userAgent.indexOf("Firefox")!=-1)
-{
-end_x = start_x = e.layerX;
-end_y = start_y = e.layerY;
-}
-else
-{
-end_x = start_x = e.offsetX;
-end_y = start_y = e.offsetY;
-}
-
-var painter = document.getElementById("painter");
-var cont = $("#cont").attr('checked');
-if (cont)
-{
-var painter = document.getElementById("painter");
-var ctx = painter.getContext("2d");
-
-/*ctx.beginPath();
-ctx.strokeStyle="#" + selected_color;
-ctx.moveTo(start_x, start_y);
-*/
-}
-painter.onmousemove = moveline;
-}
-var ee;
-var end_x = 0;
-var end_y =0;
-function moveline(e)
-{
-ee=e;
-var cont = $("#cont").attr('checked');
-if (!cont)
-{
-var painter = document.getElementById("fore_painter");
-var ctx = painter.getContext("2d");
-ctx.clearRect(Math.min(start_x, end_x) - 5, Math.min(start_y, end_y) - 5, Math.max(start_x, end_x) + 5, Math.max(start_y, end_y) + 5);
-
-if (navigator.userAgent.indexOf("Firefox")!=-1)
-{
-end_x = e.layerX;
-end_y = e.layerY;
-
-}
-else
-{
-end_x = e.offsetX;
-end_y = e.offsetY;
-}
-
-ctx.beginPath();
-ctx.lineWidth = selected_size;
-ctx.strokeStyle="#" + selected_color;
-ctx.moveTo(start_x, start_y);
-ctx.lineTo(end_x, end_y);
-ctx.stroke();
-ctx.closePath();
-}
-else
-{
-
-
-/*var painter = document.getElementById("painter");
-var ctx = painter.getContext("2d");*/
-start_x = end_x;
-start_y = end_y;
-if (navigator.userAgent.indexOf("Firefox")!=-1)
-{
-end_x = e.layerX;
-end_y = e.layerY;
-
-}
-else
-{
-end_x = e.offsetX;
-end_y = e.offsetY;
-}
-funqueue.push([start_x, start_y, end_x, end_y, selected_color]);
-/*ctx.lineTo(end_x, end_y);
-ctx.stroke();
-*/
-$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
-}
-}
-
-function endline()
-{
-var painter = document.getElementById("painter");
-painter.onmousemove = null;
-var ctx = painter.getContext("2d");
-var cont = $("#cont").attr('checked');
-if (!cont) {
-funqueue.push([start_x, start_y, end_x, end_y, selected_color, selected_size]);
-/*ctx.beginPath();
-ctx.strokeStyle="#" + selected_color;
-ctx.moveTo(start_x, start_y);
-ctx.lineTo(end_x, end_y);
-ctx.stroke();
-ctx.closePath();
-*/
-var painter = document.getElementById("fore_painter");
-var ctx = painter.getContext("2d");
-ctx.clearRect(0, 0, painter.width, painter.height);
-$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
-}else ctx.closePath();
-
-
-  
-}
 
 $(document).ready(function() {
-//  var timer = $.timer(read_lines, 1000);
   $("#clean").click(clean);
   $("#undo").click(undo);
-// timer.play();
+
+var w = screen.width;
+var h = screen.height;
+
 var painter = document.getElementById("painter");
-painter.width = screen.width;
-painter.height = screen.height;
-painter.onmousedown = startline;
-painter.onmouseup = endline;
+var ctx = painter.getContext("2d");
+painter.width = w;
+painter.height = h;
+clear_all(painter, ctx);
+$("#imagelink").attr('href', "image/" + w + "/" + h);
 
 var painter = document.getElementById("fore_painter");
-painter.width = screen.width;
-painter.height = screen.height;
-
-
+var ctx = painter.getContext("2d");
+painter.width = w;
+painter.height = h;
+clear_all(painter, ctx);
 
 $('#MyDemoColorPicker1').empty().addColorPicker({
     clickCallback: function(c) {
@@ -246,19 +42,7 @@ $('#MyDemoColorPicker1').empty().addColorPicker({
     }
 });
 
-
-/*
-$( "#size-slider" ).slider({
-    range: "min",
-    value: 1,
-    min: 1,
-    max: 15,
-    slide: function( event, ui ) {
-        selected_size = ui.value;
-    }
-});*/
-
-$("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 5, tracker:
+$("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 1, tracker:
 
 	function(){
         selected_size = $("#size-slider").noUiSlider("getValue")[0];
@@ -267,6 +51,10 @@ $("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 5, 
 );
 selected_size = $("#size-slider").noUiSlider("getValue")[0];
 
+painter.onmousedown = startline;
+painter.onmouseup = endline;
+
+
 window.setTimeout("read_lines()", deltime);
 window.setTimeout("draw_lines()", draw_deltime);
 
@@ -278,10 +66,7 @@ window.setTimeout("draw_lines()", draw_deltime);
 
 
 });
-function colorToHex(c) {
-var m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(c);
-return m ? (1 << 24 | m[1] << 16 | m[2] << 8 | m[3]).toString(16).substr(1) : c;
-}
+
 </script>
 
 <style>
@@ -358,52 +143,22 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 
 
 </style>
-<!--
 
 
-
-/*!
- * jQuery UI Slider 1.8.21
- *
- * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://jquery.org/license
- *
- * http://docs.jquery.com/UI/Slider#theming
- 
-.ui-slider { position: relative; text-align: left; }
-.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
-.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
-
-.ui-slider-horizontal { height: .8em; }
-.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
-.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
-.ui-slider-horizontal .ui-slider-range-min { left: 0; }
-.ui-slider-horizontal .ui-slider-range-max { right: 0; }
-
-.ui-slider-vertical { width: .8em; height: 100px; }
-.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
-.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
-.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
-.ui-slider-vertical .ui-slider-range-max { top: 0; }*/
-
-
--->
 </head>
 
 <body>
 
 
-<canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; top: 0; background-color: transparent;">
-</canvas>
-<canvas width="100%" height="100%" id="painter" style="position: absolute; left: 0; top: 0; background-color: transparent;">
+<canvas width="100%" height="100%" id="painter" style="position: absolute; left: 0; top: 0; background-color: transparent;"></canvas>
+<canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; top: 0; background-color: transparent;"></canvas>
 
 
-</canvas>
 <input id="clean" value="clean" type="button" style="position: relative; left: 0; top: 0;  float: left;"/>
 <input id="undo" value="undo" type="button" style="position: relative; left: 0; top: 0; float: left;"/>
-<input id="cont" value="continuous" checked="checked" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/>
+<input id="cont" value="continuous" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/><!-- checked="checked" -->
 <span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"></span>
 <div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" class="sliderbar"></div>
+<a id="imagelink"  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" target="_blank">link</a>
 </body>
 </html>
