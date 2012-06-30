@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+<title>just draw</title>
+<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<script type='text/javascript'  src="/multidraw.js"></script>
+
+<script type="text/javascript">
+
+
+function push_lines(data)
+{
+d = $.parseJSON(data);
+
+lines = d[0];
+for (line in lines)
+{
+var l = lines[line];
+funqueue.push(l);
+}
+draw_all_lines();
+
+var canvas = document.getElementById("painter");
+ var img_data=canvas.toDataURL('image/png');
+ //document.write(img_data);
+ //document.location.href = img_data;
+ //document.location.replace(img_data);
+ document.location.assign(img_data);
+    /*var img_element="<img src=\"" + img_data + "\" />";
+    $("#c").remove();
+    $("head").html("<meta http-equiv=\"content-type\" content=\"image/png\"/>");
+    $("body").html(img_element);*/
+}
+
+
+
+
+
+$(document).ready(function() {
+var canvas = document.getElementById("painter");
+canvas.width = %s;
+canvas.height = %s;
+
+$.ajax({url:"/0"}).done(push_lines);
+
+});
+
+</script>
+
+</head>
+
+<body>
+
+<canvas id="painter" style="position: absolute; left: 0; top: 0; background-color: transparent;">
+
+
+</canvas>
+
+</body>
+</html>

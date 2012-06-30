@@ -6,7 +6,7 @@ import pickle
 lines = []
 lines_index = 0
 
-allowed_files = ["jquery.min.js", "jquery.ui.core.js", "jquery.ui.widget.js", "jquery.ui.mouse.js", "jquery.ui.slider.js",]
+allowed_files = ["multidraw.js",]
     
 class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def myheaders(self):
@@ -17,7 +17,7 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def do_GET(self):
         global lines_index
         global lines
-        #global static_page
+        
 
         try:
             ind = int(self.path[1:])
@@ -57,6 +57,14 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 #self.wfile.write(static_page)
                 self.myheaders()
                 self.wfile.write(open("index.html", "rt").read())
+            elif self.path.startswith('/image/'):
+                width, height = self.path[len('/image/'):].split('/')
+                self.myheaders()
+                #self.send_response(200)
+                #self.send_header('Content-type', 'image/png')
+                #self.end_headers()
+                
+                self.wfile.write(open("image.html", "rt").read() % ( width, height))
             elif self.path[1:] in allowed_files:
                 #self.wfile.write(jquery_page)
                 
