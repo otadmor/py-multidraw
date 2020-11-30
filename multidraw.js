@@ -56,6 +56,7 @@ function draw_line(l, painter, ctx)
 {
 
 ctx.beginPath();
+ctx.lineCap = "round";
 ctx.lineWidth = l[5];
 ctx.strokeStyle="#" + l[4];
 ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
@@ -72,7 +73,7 @@ var ctx = painter.getContext("2d");
 while (funqueue.length > 0) {
     d = funqueue.shift();
     if (d == null)clear_all(painter, ctx);
-    else draw_line(d, painter, ctx);   
+    else draw_line(d, painter, ctx);
 }
 }
 
@@ -115,6 +116,7 @@ var painter = document.getElementById("painter");
 var ctx = painter.getContext("2d");
 
 ctx.beginPath();
+ctx.lineCap = "round";
 ctx.strokeStyle="#" + selected_color;
 ctx.moveTo(start_x, start_y);
 
@@ -148,6 +150,7 @@ end_y = e.offsetY;
 }
 
 ctx.beginPath();
+ctx.lineCap = "round";
 ctx.lineWidth = selected_size;
 ctx.strokeStyle="#" + selected_color;
 ctx.moveTo(start_x, start_y);
@@ -174,7 +177,7 @@ else
 end_x = e.offsetX;
 end_y = e.offsetY;
 }
-funqueue.push([start_x, start_y, end_x, end_y, selected_color]);
+funqueue.push([start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.lineTo(end_x, end_y);
 ctx.stroke();
 */
@@ -194,6 +197,7 @@ painter.onmousemove = null;
 if (!cont) {
 funqueue.push([start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
+ctx.lineCap = "round";
 ctx.strokeStyle="#" + selected_color;
 ctx.moveTo(start_x, start_y);
 ctx.lineTo(end_x, end_y);
@@ -207,7 +211,7 @@ $.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" 
 }//else ctx.closePath();
 
 
-  
+
 }
 
 
