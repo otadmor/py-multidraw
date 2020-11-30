@@ -68,7 +68,7 @@ var old_spec;
 function draw_line(l, painter, ctx)
 {
 
-    if (l[3] == "text" || l[7] == "block") {
+    if (l[7] == "text" || l[7] == "block") {
         if (old_spec) {
             ctx.stroke();
             ctx.closePath();
@@ -77,11 +77,11 @@ function draw_line(l, painter, ctx)
         if (l[7] == "block") {
             ctx.fillStyle="#" + l[5];
             ctx.fillRect(parseInt(l[1]), parseInt(l[2]), parseInt(l[3])-parseInt(l[1]), parseInt(l[4])-parseInt(l[2]));
-        } else if (l[3] == "text") {
-            var font_size = "20";
+        } else if (l[7] == "text") {
+            var font_size = l[3];
             ctx.font = font_size + "px Lucida Sans Unicode"; // selected_size
             ctx.fillStyle = "#" + l[5];
-            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+font_size);
+            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+parseInt(font_size));
         }
     } else {
         var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
@@ -163,8 +163,8 @@ end_y = start_y = e.offsetY;
         inp = window.prompt("");
         if (inp) {
 
-            funqueue.push([cur_line, start_x, start_y, "text", btoa(inp), selected_color, selected_size]);
-            add_line(start_x + "/" + start_y + "/" + "text" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size);
+            funqueue.push([cur_line, start_x, start_y, "20", btoa(inp), selected_color, selected_size]);
+            add_line(start_x + "/" + start_y + "/" + "20" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size + "/" + "text");
             new_shape();
 
         }
