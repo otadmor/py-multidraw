@@ -8,7 +8,16 @@
 <script type='text/javascript'  src="/multidraw.js"></script>
 
 <script type="text/javascript">
+  function set_bg(color) {
 
+var painter = document.getElementById("painter");
+var ctx = painter.getContext('2d');
+
+ctx.globalCompositeOperation = "destination-over";
+ctx.fillStyle = color;
+ctx.fillRect(0,0,painter.width, painter.height);
+
+  }
 
 function push_lines(data)
 {
@@ -21,9 +30,9 @@ var l = lines[line];
 funqueue.push(l);
 }
 draw_all_lines();
+    set_bg("#ffffff");
 
-var canvas = document.getElementById("painter");
- var img_data=canvas.toDataURL('image/png');
+ var img_data=painter.toDataURL('image/png');
  //document.write(img_data);
  //document.location.href = img_data;
  //document.location.replace(img_data);
@@ -40,8 +49,8 @@ var canvas = document.getElementById("painter");
 
 $(document).ready(function() {
 var canvas = document.getElementById("painter");
-canvas.width = %s;
-canvas.height = %s;
+    canvas.width = parseInt("%s");
+    canvas.height = parseInt("%s");
 
 $.ajax({url:"/0"}).done(push_lines);
 
