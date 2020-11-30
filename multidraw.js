@@ -16,14 +16,14 @@ var selected_size = 1;
 var funqueue = [];
 var last_index = 0;
 var lines_painted = 0;
-
+arrow_min_size = 4
 function canvas_arrow(context, fromx, fromy, tox, toy, size) {
-  var headlen = 3*size; // length of head in pixels
+    var headlen = 3*Math.max(arrow_min_size, size); // length of head in pixels
   var dx = tox - fromx;
   var dy = toy - fromy;
   var angle = Math.atan2(dy, dx);
   context.moveTo(fromx, fromy);
-    context.lineTo(tox+(size>3), toy+(size>3));
+    context.lineTo(tox+(size>1), toy+(size>1));
   context.moveTo(tox, toy);
   context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
   context.moveTo(tox, toy);
@@ -69,7 +69,7 @@ function draw_line(l, painter, ctx)
 {
 
     var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
-    if (false && old_spec && cur_spec.toString() == old_spec.toString()) {
+    if (old_spec && cur_spec.toString() == old_spec.toString()) {
         ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
     } else {
         if (old_spec) {
@@ -165,6 +165,7 @@ function moveline(e)
     ee=e;
 
 
+    var line = $("#radio_1").attr('checked');
     var cont = $("#radio_2").attr('checked');
     var rectangle=$("#radio_3").attr('checked');
     var arrow=$("#radio_4").attr('checked');
@@ -227,7 +228,7 @@ ctx.stroke();
 ctx.closePath();
 
 
-    } else if (!cont)
+    } else if (line)
 {
 var painter = document.getElementById("fore_painter");
 var ctx = painter.getContext("2d");
@@ -286,6 +287,7 @@ function endline()
 {
 var painter = document.getElementById("painter");
 var ctx = painter.getContext("2d");
+    var line = $("#radio_1").attr('checked');
     var cont = $("#radio_2").attr('checked');
     var rectangle=$("#radio_3").attr('checked');
     var arrow=$("#radio_4").attr('checked');
@@ -296,15 +298,15 @@ var painter = document.getElementById("fore_painter");
     clear_all(painter, ctx);
 
     if (arrow) {
-          var headlen = 3*selected_size; // length of head in pixels
+        var headlen = 3*Math.max(selected_size, arrow_min_size); // length of head in pixels
   var dx = end_x - start_x;
   var dy = end_y - start_y;
   var angle = Math.atan2(dy, dx);
-        funqueue.push([cur_line, start_x, start_y, end_x+(selected_size>3), end_y+(selected_size>3), selected_color, selected_size]);
+        funqueue.push([cur_line, start_x, start_y, end_x+(selected_size>1), end_y+(selected_size>1), selected_color, selected_size]);
 funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle - Math.PI / 6), end_y - headlen * Math.sin(angle - Math.PI / 6), selected_color, selected_size]);
 funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle + Math.PI / 6), end_y - headlen * Math.sin(angle + Math.PI / 6), selected_color, selected_size]);
 
-        $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + (end_x+(selected_size>3)) + "/" + (end_y+(selected_size>3)) + "/" + selected_color + "/" + selected_size});
+        $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size});
     $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle - Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle - Math.PI / 6)) + "/" + selected_color + "/" + selected_size});
     $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle + Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle + Math.PI / 6)) + "/" + selected_color + "/" + selected_size});
 
@@ -319,7 +321,7 @@ funqueue.push([cur_line, start_x, end_y, start_x, start_y, selected_color, selec
     $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
     $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
     $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size});
-    } else if (!cont) {
+    } else if (line) {
 funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
 ctx.lineCap = "round";
