@@ -236,21 +236,22 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 
 <canvas width="100%" height="100%" id="painter" style="position: absolute; left: 0; top: 0; background-color: transparent;"></canvas>
 <canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; top: 0; background-color: transparent;"></canvas>
+<div style="position: relative; left: 0; top: 0;  float: left;">
 
+<a id="imagelink" class="link_button" target="_blank" style="float: left;">link</a>
+<a id="clean" class="link_button"  style="float: left;" href="#">clean</a>
+<a id="undo" class="link_button"  style="float: left;" href="#">undo</a>
 
-<a id="imagelink" class="link_button" style="position: relative; left: 0; top: 0;  float: left;" target="_blank">link</a>
-<a id="clean" class="link_button" style="position: relative; left: 0; top: 0;  float: left;" href="#">clean</a>
-<a id="undo" class="link_button" style="position: relative; left: 0; top: 0; float: left;" href="#">undo</a>
-<span style="position: relative; left: 0; top: 0; float: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <div class="radio-toolbar" >
-  <input type='radio' id='radio_3' name="type" value='rectangle' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_3" style="position: relative; left: 0; top: 0; float: left;">rect</label>
-  <input type='radio' id='radio_4' name="type" value='arrow' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_4" style="position: relative; left: 0; top: 0; float: left;">arrow</label>
-    <input type='radio' id='radio_5' name="type" value='text' style="position: relative; left: 0; top: 0;float: left;"/><label for="radio_5" style="position: relative; left: 0; top: 0; float: left;">text</label>
-  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_1" style="position: relative; left: 0; top: 0; float: left;">line</label>
-  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0;float: left;" /><label for="radio_2" style="position: relative; left: 0; top: 0; float: left;">brush</label>
+  <input type='radio' id='radio_2' name="type" value='brush' style="float: right;" /><label for="radio_2" style="float: right;">brush<sub style="font-size:10px; ">5</sub></label>
+  <input type='radio' id='radio_1' name="type" value='line' style="float: right;"/><label for="radio_1" style="float: right;">line<sub style="font-size:10px; ">4</sub></label>
+  <input type='radio' id='radio_5' name="type" value='text' style="float: right;"/><label for="radio_5" style="float: right;">text<sub style="font-size:10px; ">3</sub></label>
+  <input type='radio' id='radio_4' name="type" value='arrow' style="float: right;"/><label for="radio_4" style="float: right;">arrow<sub style="font-size:10px; ">2</sub></label>
+  <input type='radio' id='radio_3' name="type" value='rectangle'  style="float: right;"/><label for="radio_3" style="float: right;">rect<sub style="font-size:10px; ">1</sub></label>
   </div>
-<span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; padding-top: 10px; "></span>
-<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; top:16px; width: 480px;" class="sliderbar"></div>
+<span id='MyDemoColorPicker1'  style="float: left;clear:left; padding-top: 10px; "></span>
+<div id="size-slider" style="float: left;clear:left; top:16px; width: 480px;"  class="sliderbar"></div>
 
+</div>
 </body>
 </html>
