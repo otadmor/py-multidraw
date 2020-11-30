@@ -49,7 +49,7 @@ clear_all(painter, ctx);
     }
 });
 
-$("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 1, tracker:
+    $("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 5, startMax: 15, tracker:
 
 	function(){
         selected_size = $("#size-slider").noUiSlider("getValue")[0];
@@ -96,8 +96,8 @@ cursor:crosshair;
 * {-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: -moz-none; -o-user-select: none; user-select: none; }
 input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -moz-text; -o-user-select: text; user-select: text; }
 
-.ColorBlotch { width: 20px;padding: 5px;border-style:solid;border-width:0px;border-color: #000000;}
-.ColorBlotch:first-child { width: 20px;padding: 4px;border-style:solid;border-width:1px;border-color: #000000;}
+.ColorBlotch { width: 20px;padding: 8px;border-style:solid;border-width:0px;}
+.ColorBlotch:first-child { border-width:1px;border-color: #000000;}
 
 
 /* The slider itself. Set a height, background, border, width, etc. */
@@ -158,8 +158,63 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 	border-color:			#2673AB;
 }
 
+.noUi_upperHandle { display: none; }
+
+.link_button {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: solid 1px #20538D;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: #4479BA;
+    color: #FFF;
+    padding: 8px 12px;
+    text-decoration: none;
+}
 
 
+.radio-toolbar {
+}
+
+.radio-toolbar input[type="radio"] {
+  opacity: 0;
+  position: fixed;
+  width: 0;
+  padding:0;
+  margin: 0;
+}
+
+.radio-toolbar label {
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: solid 1px #20538D;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    background: #4479BA;
+    color: #FFF;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.radio-toolbar label:hover {
+    background: #4479BA;
+}
+
+.radio-toolbar input[type="radio"]:focus + label {
+    border-color: #444;
+}
+
+.radio-toolbar input[type="radio"]:checked + label {
+    background: #14495A;
+    /* border-color: #4c4; */
+}
 
 
 </style>
@@ -174,18 +229,19 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 <canvas width="100%" height="100%" id="fore_painter" style="position: absolute; left: 0; top: 0; background-color: transparent;"></canvas>
 
 
-<input id="clean" value="clean" type="button" style="position: relative; left: 0; top: 0;  float: left;"/>
-<input id="undo" value="undo" type="button" style="position: relative; left: 0; top: 0; float: left;"/>
-<!--<input id="cont" value="continuous" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/><!-- checked="checked" -->
+<a id="imagelink" class="link_button" style="position: relative; left: 0; top: 0;  float: left;" target="_blank">link</a>
+<a id="clean" class="link_button" style="position: relative; left: 0; top: 0;  float: left;" href="#">clean</a>
+<a id="undo" class="link_button" style="position: relative; left: 0; top: 0; float: left;" href="#">undo</a>
+<span style="position: relative; left: 0; top: 0; float: left;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<div class="radio-toolbar" >
+  <input type='radio' id='radio_3' name="type" value='rectangle' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_3" style="position: relative; left: 0; top: 0; float: left;">rect</label>
+  <input type='radio' id='radio_4' name="type" value='arrow' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_4" style="position: relative; left: 0; top: 0; float: left;">arrow</label>
+    <input type='radio' id='radio_5' name="type" value='text' style="position: relative; left: 0; top: 0;float: left;"/><label for="radio_5" style="position: relative; left: 0; top: 0; float: left;">text</label>
+  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; float: left;"/><label for="radio_1" style="position: relative; left: 0; top: 0; float: left;">line</label>
+  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0;float: left;" /><label for="radio_2" style="position: relative; left: 0; top: 0; float: left;">brush</label>
+  </div>
+<span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; padding-top: 10px; "></span>
+<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; top:16px; width: 480px;" class="sliderbar"></div>
 
-
-  <input type='radio' id='radio_3' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">rect</span>
-  <input type='radio' id='radio_4' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">arrow</span>
-    <input type='radio' id='radio_5' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">text</span>
-  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">line</span>
-  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" /><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">brush</span>
-<span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; padding: 10px; "></span>
-<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; top:10px" class="sliderbar"></div>
-<a id="imagelink"  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" target="_blank">link</a>
 </body>
 </html>
