@@ -68,31 +68,37 @@ var old_spec;
 function draw_line(l, painter, ctx)
 {
 
-    var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
-    if (l[3] != "text" && old_spec && cur_spec.toString() == old_spec.toString()) {
-        ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
-    } else {
-        if (old_spec || l[3] == "text") {
+    if (l[3] == "text" || l[7] == "block") {
+        if (old_spec) {
             ctx.stroke();
             ctx.closePath();
+            old_spec = undefined;
         }
-        if (l[3] == "text") {
-            ctx.font = "20px Lucida Sans Unicode"; // selected_size
+        if (l[7] == "block") {
+            ctx.fillStyle="#" + l[5];
+            ctx.fillRect(parseInt(l[1]), parseInt(l[2]), parseInt(l[3])-parseInt(l[1]), parseInt(l[4])-parseInt(l[2]));
+        } else if (l[3] == "text") {
+            var font_size = "20";
+            ctx.font = font_size + "px Lucida Sans Unicode"; // selected_size
             ctx.fillStyle = "#" + l[5];
-            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+20);
-
+            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+font_size);
+        }
+    } else {
+        var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
+        if (old_spec && cur_spec.toString() == old_spec.toString()) {
+            ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
         } else {
-        ctx.beginPath();
-        ctx.lineCap = "round";
-        ctx.lineWidth = l[6];
-        ctx.strokeStyle="#" + l[5];
-        ctx.moveTo(parseInt(l[1]), parseInt(l[2]));
+            if (old_spec) {
+                ctx.stroke();
+                ctx.closePath();
+            }
+            ctx.beginPath();
+            ctx.lineCap = "round";
+            ctx.lineWidth = l[6];
+            ctx.strokeStyle="#" + l[5];
+            ctx.moveTo(parseInt(l[1]), parseInt(l[2]));
             ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
         }
-    }
-    if (l[3] == "text") {
-        old_spec = undefined;
-    } else {
         old_spec = [parseInt(l[3]), parseInt(l[4]), l[5], l[6], l[0]]
     }
 }
@@ -194,7 +200,31 @@ function moveline(e)
     var cont = $("#radio_2").attr('checked');
     var rectangle=$("#radio_3").attr('checked');
     var arrow=$("#radio_4").attr('checked');
-    if (arrow) {
+    var block=$("#radio_6").attr('checked');
+    if (block) {
+
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+var space_width = 2 * selected_size; // should actually be sqrt(2) * selected_size because the max size is given on 45 degrees
+ctx.clearRect(Math.min(start_x, end_x) - space_width, Math.min(start_y, end_y) - space_width, Math.max(start_x, end_x) + space_width, Math.max(start_y, end_y) + space_width);
+
+if (navigator.userAgent.indexOf("Firefox")!=-1)
+{
+end_x = e.layerX;
+end_y = e.layerY;
+
+}
+else
+{
+end_x = e.offsetX;
+end_y = e.offsetY;
+}
+
+ctx.fillStyle="#" + selected_color;
+ctx.fillRect(start_x, start_y, end_x-start_x, end_y-start_y);
+
+
+    } else if (arrow) {
 var painter = document.getElementById("fore_painter");
 var ctx = painter.getContext("2d");
 var space_width = 20 * selected_size; // should actually be sqrt(2) * selected_size because the max size is given on 45 degrees
@@ -317,13 +347,17 @@ var ctx = painter.getContext("2d");
     var cont = $("#radio_2").attr('checked');
     var rectangle=$("#radio_3").attr('checked');
     var arrow=$("#radio_4").attr('checked');
+    var block=$("#radio_6").attr('checked');
 
 var painter = document.getElementById("fore_painter");
     painter.onmousemove = null;
     var ctx = painter.getContext("2d");
     clear_all(painter, ctx);
 
-    if (arrow) {
+    if (block) {
+        funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size, "block"]);
+        add_line(start_x + "/" + start_y + "/" + end_x + "/" +  end_y + "/" + selected_color + "/" + selected_size + "/" + "block");
+    } else if (arrow) {
         var headlen = 3*Math.max(selected_size, arrow_min_size); // length of head in pixels
   var dx = end_x - start_x;
   var dy = end_y - start_y;
