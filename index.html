@@ -36,7 +36,14 @@ painter.width = w;
 painter.height = h;
 clear_all(painter, ctx);
 
-$('#MyDemoColorPicker1').empty().addColorPicker({
+    $('#MyDemoColorPicker1').empty().addColorPicker({
+        colors: [
+			'#ffffff','#d0d0d0','#777777','#000000', // monochromes
+			'#ffaaaa','#ff00ff', '#ff0000','#aa0000','#9000ff', // reds
+			'#ff6c00', '#ffff00', '#ffbb00', '#f0e68c','#d2b229', // browns/oranges/yellows
+			'#aaffaa','#00ff00','#00aa00','#6b8e23','#007700', // greens
+			'#bbddff','#00ffdd', '#aaaaff','#0000ff','#0000aa' // blues
+	],
     clickCallback: function(c) {
         selected_color = colorToHex(c);
     }
@@ -77,7 +84,8 @@ cursor:crosshair;
 * {-webkit-user-select: none; -khtml-user-select: none; -moz-user-select: -moz-none; -o-user-select: none; user-select: none; }
 input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -moz-text; -o-user-select: text; user-select: text; }
 
-.ColorBlotch { width: 20px;padding: 5px;}
+.ColorBlotch { width: 20px;padding: 5px;border-style:solid;border-width:0px;border-color: #000000;}
+.ColorBlotch:first-child { width: 20px;padding: 4px;border-style:solid;border-width:1px;border-color: #000000;}
 
 
 /* The slider itself. Set a height, background, border, width, etc. */
