@@ -79,7 +79,7 @@ function draw_line(l, painter, ctx)
         if (l[3] == "text") {
             ctx.font = "20px Lucida Sans Unicode"; // selected_size
             ctx.fillStyle = "#" + l[5];
-            ctx.fillText(atob(l[4]), l[1], l[2]);
+            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+20);
 
         } else {
         ctx.beginPath();

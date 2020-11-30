@@ -61,8 +61,24 @@ selected_size = $("#size-slider").noUiSlider("getValue")[0];
 painter.onmousedown = startline;
 painter.onmouseup = endline;
 
-$("#radio_1").attr('checked', 'checked');
+    $("#radio_3").attr('checked', 'checked');
 
+document.onkeyup = function(e) {
+    if (e.altKey && e.which == 52) {
+    $("#radio_1").attr('checked', 'checked');
+    } else if (e.altKey && e.which == 53) {
+    $("#radio_2").attr('checked', 'checked');
+    } else if (e.altKey && e.which == 49) {
+    $("#radio_3").attr('checked', 'checked');
+    } else if (e.altKey && e.which == 50) {
+    $("#radio_4").attr('checked', 'checked');
+    } else if (e.altKey && e.which == 51) {
+    $("#radio_5").attr('checked', 'checked');
+    } else if (e.ctrlKey && e.which == 90) {
+        undo();
+    }
+
+}
 window.setTimeout("read_lines()", deltime);
 window.setTimeout("draw_lines()", draw_deltime);
 
@@ -162,13 +178,14 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 <input id="undo" value="undo" type="button" style="position: relative; left: 0; top: 0; float: left;"/>
 <!--<input id="cont" value="continuous" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/><!-- checked="checked" -->
 
-  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">line</span>
-  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" /><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">brush</span>
+
   <input type='radio' id='radio_3' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">rect</span>
   <input type='radio' id='radio_4' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">arrow</span>
     <input type='radio' id='radio_5' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">text</span>
-<span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"></span>
-<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; " class="sliderbar"></div>
+  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">line</span>
+  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" /><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">brush</span>
+<span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; padding: 10px; "></span>
+<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; top:10px" class="sliderbar"></div>
 <a id="imagelink"  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" target="_blank">link</a>
 </body>
 </html>
