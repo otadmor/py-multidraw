@@ -1,3 +1,4 @@
+#python2
 from BaseHTTPServer import HTTPServer
 from CGIHTTPServer import CGIHTTPRequestHandler
 import pickle
@@ -6,8 +7,8 @@ import pickle
 lines = []
 lines_index = 0
 
-allowed_files = ["multidraw.js",]
-    
+allowed_files = ["multidraw.js","sgbeal-colorpicker.jquery.js", "jquery.min.js", "jquery.nouislider.min.js"]
+
 class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def myheaders(self):
         self.send_response(200)
@@ -17,11 +18,11 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def do_GET(self):
         global lines_index
         global lines
-        
+
 
         try:
             ind = int(self.path[1:])
-            if ind - lines_index < 0: 
+            if ind - lines_index < 0:
                 lines_index = 0
                 ind = 0
             self.myheaders()
@@ -63,18 +64,18 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 #self.send_response(200)
                 #self.send_header('Content-type', 'image/png')
                 #self.end_headers()
-                
+
                 self.wfile.write(open("image.html", "rt").read() % ( width, height))
             elif self.path[1:] in allowed_files:
                 #self.wfile.write(jquery_page)
-                
+
                 if self.path.endswith('.js'):
                     self.send_response(200)
                     self.send_header('Content-type', 'application/javascript')
                     self.end_headers()
                     self.wfile.write(open(self.path[1:], "rt").read())
 
-        
+
 
 def start_server(port):
     global lines
@@ -82,7 +83,7 @@ def start_server(port):
         lines = pickle.load(open('objects.pkl', "rb"))
     except:
         lines = []
-        
+
     server = HTTPServer(('', port), CompGeoRequestHandler)
     try:
         server.serve_forever()
