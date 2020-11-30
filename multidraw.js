@@ -52,17 +52,26 @@ ctx.clearRect(0, 0, painter.width, painter.height);
 
 var opened = false;
 
+var old_spec;
 function draw_line(l, painter, ctx)
 {
 
-ctx.beginPath();
-ctx.lineCap = "round";
-ctx.lineWidth = l[5];
-ctx.strokeStyle="#" + l[4];
-ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
-ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
-ctx.stroke();
-ctx.closePath();
+    var cur_spec = [parseInt(l[0]), parseInt(l[1]), l[4], l[5]];
+    if (old_spec && cur_spec.toString() == old_spec.toString()) {
+        ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+    } else {
+        if (old_spec) {
+            ctx.stroke();
+            ctx.closePath();
+        }
+        ctx.beginPath();
+        ctx.lineCap = "round";
+        ctx.lineWidth = l[5];
+        ctx.strokeStyle="#" + l[4];
+        ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
+        ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+    }
+    old_spec = [parseInt(l[2]), parseInt(l[3]), l[4], l[5]]
 }
 
 function draw_all_lines()
@@ -70,11 +79,24 @@ function draw_all_lines()
 var painter = document.getElementById("painter");
 var ctx = painter.getContext("2d");
 
+    old_spec = undefined;
 while (funqueue.length > 0) {
     d = funqueue.shift();
-    if (d == null)clear_all(painter, ctx);
+    if (d == null) {
+        if (old_spec) {
+            ctx.stroke();
+            ctx.closePath();
+            old_spec = undefined;
+        }
+        clear_all(painter, ctx);
+    }
     else draw_line(d, painter, ctx);
 }
+    if (old_spec) {
+        ctx.stroke();
+        ctx.closePath();
+    }
+    old_spec = undefined;
 }
 
 
