@@ -56,9 +56,9 @@ var old_spec;
 function draw_line(l, painter, ctx)
 {
 
-    var cur_spec = [parseInt(l[0]), parseInt(l[1]), l[4], l[5]];
+    var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
     if (old_spec && cur_spec.toString() == old_spec.toString()) {
-        ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+        ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
     } else {
         if (old_spec) {
             ctx.stroke();
@@ -66,12 +66,12 @@ function draw_line(l, painter, ctx)
         }
         ctx.beginPath();
         ctx.lineCap = "round";
-        ctx.lineWidth = l[5];
-        ctx.strokeStyle="#" + l[4];
-        ctx.moveTo(parseInt(l[0]), parseInt(l[1]));
-        ctx.lineTo(parseInt(l[2]), parseInt(l[3]));
+        ctx.lineWidth = l[6];
+        ctx.strokeStyle="#" + l[5];
+        ctx.moveTo(parseInt(l[1]), parseInt(l[2]));
+        ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
     }
-    old_spec = [parseInt(l[2]), parseInt(l[3]), l[4], l[5]]
+    old_spec = [parseInt(l[3]), parseInt(l[4]), l[5], l[6], l[0]]
 }
 
 function draw_all_lines()
@@ -128,7 +128,7 @@ else
 end_x = start_x = e.offsetX;
 end_y = start_y = e.offsetY;
 }
-
+cur_line = lines_count;
 var painter = document.getElementById("fore_painter");
 painter.onmousemove = moveline;
 /*var cont = $("#cont").attr('checked');
@@ -199,11 +199,11 @@ else
 end_x = e.offsetX;
 end_y = e.offsetY;
 }
-funqueue.push([start_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.lineTo(end_x, end_y);
 ctx.stroke();
 */
-$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+$.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
 }
 }
 
@@ -217,7 +217,7 @@ var painter = document.getElementById("fore_painter");
 painter.onmousemove = null;
 
 if (!cont) {
-funqueue.push([start_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
 ctx.lineCap = "round";
 ctx.strokeStyle="#" + selected_color;
@@ -229,7 +229,8 @@ ctx.closePath();
 var ctx = painter.getContext("2d");
 clear_all(painter, ctx);
 
-$.ajax({url:"/add/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    cur_line = undefined;
 }//else ctx.closePath();
 
 

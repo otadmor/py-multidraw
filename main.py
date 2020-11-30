@@ -51,7 +51,10 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 self.wfile.write("")
             elif self.path.startswith('/undo'):
                 #lines_index -= 1
-                del lines[len(lines) - 1]
+                prev = None
+                remove_index = lines[len(lines) - 1][0]
+                lines = [l for l in lines if l[0] != remove_index]
+                # del lines[len(lines) - 1]
                 self.myheaders()
                 self.wfile.write("")
             elif self.path == '/':
