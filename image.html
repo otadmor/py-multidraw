@@ -3,11 +3,14 @@
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 <title>just draw</title>
-<script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type='text/javascript' src="/jquery.min.js"></script>
 
 <script type='text/javascript'  src="/multidraw.js"></script>
 
 <script type="text/javascript">
+  var client_id=0;
+    var sent_lines=0;
+
   function set_bg(color) {
 
 var painter = document.getElementById("painter");
@@ -22,17 +25,24 @@ ctx.fillRect(0,0,painter.width, painter.height);
 function push_lines(data)
 {
 d = $.parseJSON(data);
-
+    var painter = document.getElementById("painter");
 lines = d[0];
 for (line in lines)
 {
 var l = lines[line];
 funqueue.push(l);
 }
+        if (funqueue.length == 0) { document.write('<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==" width="' + painter.width + '" height="' + painter.height + '" />'); return; }
 draw_all_lines();
     set_bg("#ffffff");
 
- var img_data=painter.toDataURL('image/png');
+
+
+    var img_data=painter.toDataURL('image/png');
+    // i = document.createElement("img");
+    // i.src=img_data;
+    // document.body.appendChild(i);
+
  //document.write(img_data);
  //document.location.href = img_data;
  //document.location.replace(img_data);
