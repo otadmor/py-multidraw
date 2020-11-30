@@ -1,6 +1,10 @@
 #python2
-from BaseHTTPServer import HTTPServer
-from CGIHTTPServer import CGIHTTPRequestHandler
+try:
+    from BaseHTTPServer import HTTPServer
+    from CGIHTTPServer import CGIHTTPRequestHandler
+except:
+    from socketserver import TCPServer as HTTPServer
+    from http.server import CGIHTTPRequestHandler
 import pickle
 import json
 #static_page = open("index.html", "rt").read()
@@ -34,41 +38,41 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
                 lines_index = 0
                 ind = 0
             self.myheaders()
-            self.wfile.write(json.dumps([lines[ind - lines_index:], lines_index, len(lines)]))
+            self.wfile.write(json.dumps([lines[ind - lines_index:], lines_index, len(lines)]).encode('utf-8'))
         elif self.path.startswith('/add'):
             coords = [a for a in self.path[len('/add/'):].split('/')]
             lines.append(coords)
             self.myheaders()
-            self.wfile.write("")
+            self.wfile.write(b"")
         elif self.path.startswith('/clean'):
             lines_index += len(lines)
             lines = []
             self.myheaders()
-            self.wfile.write("")
+            self.wfile.write(b"")
         elif self.path.startswith('/save/'):
             p = self.path[len('/save/'):].replace('.','_').replace('/', '_').replace('\\', '_')
             pickle.dump(lines, open(p + '.pkl', 'wb'))
             self.myheaders()
-            self.wfile.write("")
+            self.wfile.write(b"")
         elif self.path.startswith('/load/'):
             p = self.path[len('/load/'):].replace('.','_').replace('/', '_').replace('\\', '_')
             lines_index = 0
             lines = pickle.load(open(p + '.pkl', 'rb'))
             self.myheaders()
-            self.wfile.write("")
+            self.wfile.write(b"")
         elif self.path.startswith('/undo'):
             if len(lines) != 0:
                 remove_index = lines[len(lines) - 1][0]
                 lines = [l for l in lines if l[0] != remove_index]
                 # del lines[len(lines) - 1]
             self.myheaders()
-            self.wfile.write("")
+            self.wfile.write(b"")
         elif self.path == '/':
             client_id = clients
             clients+=1
             #self.wfile.write(static_page)
             self.myheaders()
-            self.wfile.write(open("index.html", "rt").read().replace("client_id=0", "client_id=" + str(client_id)))
+            self.wfile.write(open("index.html", "rt").read().replace("client_id=0", "client_id=" + str(client_id)).encode('utf-8'))
         elif self.path.startswith('/image/'):
             width, height = self.path[len('/image/'):].split('/')
             self.myheaders()
@@ -76,16 +80,10 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
             #self.send_header('Content-type', 'image/png')
             #self.end_headers()
 
-            self.wfile.write(open("image.html", "rt").read() % ( width, height))
+            self.wfile.write((open("image.html", "rt").read() % ( width, height)).encode('utf-8'))
         elif self.path[1:] in allowed_files:
             #self.wfile.write(jquery_page)
-
-            if self.path.endswith('.js'):
-                self.send_response(200)
-                self.send_header('Content-type', 'application/javascript')
-                self.end_headers()
-                self.wfile.write(open(self.path[1:], "rt").read())
-
+            CGIHTTPRequestHandler.do_GET(self)
 
 
 def start_server(port):
@@ -96,7 +94,9 @@ def start_server(port):
     except:
         lines = []
 
+    HTTPServer.allow_reuse_address = True
     server = HTTPServer(('', port), CompGeoRequestHandler)
+    server.allow_reuse_address = True
     try:
         server.serve_forever()
     except:
