@@ -17,7 +17,6 @@ var funqueue = [];
 var last_index = 0;
 var lines_painted = 0;
 
-
 function done_read_lines(data)
 {
 d = $.parseJSON(data);
@@ -150,9 +149,44 @@ var end_x = 0;
 var end_y =0;
 function moveline(e)
 {
-ee=e;
-var cont = $("#cont").attr('checked');
-if (!cont)
+    ee=e;
+
+
+    var cont = $("#radio_2").attr('checked');
+    var rectangle=$("#radio_3").attr('checked');
+    if (rectangle) {
+
+var painter = document.getElementById("fore_painter");
+var ctx = painter.getContext("2d");
+var space_width = 2 * selected_size; // should actually be sqrt(2) * selected_size because the max size is given on 45 degrees
+ctx.clearRect(Math.min(start_x, end_x) - space_width, Math.min(start_y, end_y) - space_width, Math.max(start_x, end_x) + space_width, Math.max(start_y, end_y) + space_width);
+
+if (navigator.userAgent.indexOf("Firefox")!=-1)
+{
+end_x = e.layerX;
+end_y = e.layerY;
+
+}
+else
+{
+end_x = e.offsetX;
+end_y = e.offsetY;
+}
+
+ctx.beginPath();
+ctx.lineCap = "round";
+ctx.lineWidth = selected_size;
+ctx.strokeStyle="#" + selected_color;
+ctx.moveTo(start_x, start_y);
+ctx.lineTo(end_x, start_y);
+ctx.lineTo(end_x, end_y);
+ctx.lineTo(start_x, end_y);
+ctx.lineTo(start_x, start_y);
+ctx.stroke();
+ctx.closePath();
+
+
+    } else if (!cont)
 {
 var painter = document.getElementById("fore_painter");
 var ctx = painter.getContext("2d");
@@ -211,12 +245,25 @@ function endline()
 {
 var painter = document.getElementById("painter");
 var ctx = painter.getContext("2d");
-var cont = $("#cont").attr('checked');
+    var cont = $("#radio_2").attr('checked');
+    var rectangle=$("#radio_3").attr('checked');
 
 var painter = document.getElementById("fore_painter");
 painter.onmousemove = null;
+    if (rectangle) {
+funqueue.push([cur_line, start_x, start_y, end_x, start_y, selected_color, selected_size]);
+funqueue.push([cur_line, end_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, end_x, end_y, start_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, start_x, end_y, start_x, start_y, selected_color, selected_size]);
 
-if (!cont) {
+var ctx = painter.getContext("2d");
+clear_all(painter, ctx);
+
+    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + start_y + "/" + selected_color + "/" + selected_size});
+    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size});
+    } else if (!cont) {
 funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
 ctx.lineCap = "round";
@@ -230,10 +277,9 @@ var ctx = painter.getContext("2d");
 clear_all(painter, ctx);
 
     $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
-    cur_line = undefined;
 }//else ctx.closePath();
 
-
+    cur_line = undefined;
 
 }
 

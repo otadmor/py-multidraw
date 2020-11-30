@@ -17,7 +17,7 @@
 
 
 $(document).ready(function() {
-  $("#clean").click(clean);
+  $("#clean").dblclick(clean);
   $("#undo").click(undo);
 
 var w = screen.width;
@@ -61,14 +61,10 @@ selected_size = $("#size-slider").noUiSlider("getValue")[0];
 painter.onmousedown = startline;
 painter.onmouseup = endline;
 
+$("#radio_1").attr('checked', 'checked');
 
 window.setTimeout("read_lines()", deltime);
 window.setTimeout("draw_lines()", draw_deltime);
-
-
-
-
-
 
 
 
@@ -164,9 +160,13 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 
 <input id="clean" value="clean" type="button" style="position: relative; left: 0; top: 0;  float: left;"/>
 <input id="undo" value="undo" type="button" style="position: relative; left: 0; top: 0; float: left;"/>
-<input id="cont" value="continuous" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/><!-- checked="checked" -->
+<!--<input id="cont" value="continuous" type="checkbox" style="position: relative; left: 0; top: 0; float: left;"/><!-- checked="checked" -->
+
+  <input type='radio' id='radio_1' name="type" value='line' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">line</span>
+  <input type='radio' id='radio_2' name="type" value='brush' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" /><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">brush</span>
+  <input type='radio' id='radio_3' name="type" value='rectangle' style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"/><span style="position: relative; left: 0; top: 0; background-color: transparent; float: left;">rect</span>
 <span id='MyDemoColorPicker1'  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;"></span>
-<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" class="sliderbar"></div>
+<div id="size-slider" style="position: relative; left: 0; top: 0; background-color: transparent; float: left;clear:left; " class="sliderbar"></div>
 <a id="imagelink"  style="position: relative; left: 0; top: 0; background-color: transparent; float: left;" target="_blank">link</a>
 </body>
 </html>
