@@ -25,9 +25,9 @@ function canvas_arrow(context, fromx, fromy, tox, toy, size) {
   context.moveTo(fromx, fromy);
     context.lineTo(tox+(size>1), toy+(size>1));
   context.moveTo(tox, toy);
-  context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+    context.lineTo((tox - headlen * Math.cos(angle - Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle - Math.PI / 6))|0);
   context.moveTo(tox, toy);
-  context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+    context.lineTo((tox - headlen * Math.cos(angle + Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle + Math.PI / 6))|0);
 }
 
 function done_read_lines(data)
@@ -329,12 +329,12 @@ var painter = document.getElementById("fore_painter");
   var dy = end_y - start_y;
   var angle = Math.atan2(dy, dx);
         funqueue.push([cur_line, start_x, start_y, end_x+(selected_size>1), end_y+(selected_size>1), selected_color, selected_size]);
-funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle - Math.PI / 6), end_y - headlen * Math.sin(angle - Math.PI / 6), selected_color, selected_size]);
-funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle + Math.PI / 6), end_y - headlen * Math.sin(angle + Math.PI / 6), selected_color, selected_size]);
+        funqueue.push([cur_line, end_x, end_y, (end_x - headlen * Math.cos(angle - Math.PI / 6))|0, (end_y - headlen * Math.sin(angle - Math.PI / 6))|0, selected_color, selected_size]);
+        funqueue.push([cur_line, end_x, end_y, (end_x - headlen * Math.cos(angle + Math.PI / 6))|0, (end_y - headlen * Math.sin(angle + Math.PI / 6))|0, selected_color, selected_size]);
 
         add_line(start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size);
-    add_line(end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle - Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle - Math.PI / 6)) + "/" + selected_color + "/" + selected_size);
-    add_line(end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle + Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle + Math.PI / 6)) + "/" + selected_color + "/" + selected_size);
+        add_line(end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle - Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle - Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
+        add_line(end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle + Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle + Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
 
 
     } else if (rectangle) {

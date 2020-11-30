@@ -61,11 +61,11 @@ clear_all(painter, ctx);
     $("#size-slider").noUiSlider("init", { bar: "off", scale: [1, 15], startMin: 5, startMax: 15, tracker:
 
 	function(){
-        selected_size = $("#size-slider").noUiSlider("getValue")[0];
+        selected_size = $("#size-slider").noUiSlider("getValue")[0]|0;
 
     }   }
 );
-selected_size = $("#size-slider").noUiSlider("getValue")[0];
+selected_size = $("#size-slider").noUiSlider("getValue")[0]|0;
 
 painter.onmousedown = startline;
 painter.onmouseup = endline;
