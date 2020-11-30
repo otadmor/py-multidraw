@@ -158,7 +158,8 @@ end_y = start_y = e.offsetY;
         if (inp) {
 
             funqueue.push([cur_line, start_x, start_y, "text", btoa(inp), selected_color, selected_size]);
-            $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + "text" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size});
+            add_line(start_x + "/" + start_y + "/" + "text" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size);
+            new_shape();
 
         }
         cur_line = undefined;
@@ -303,7 +304,8 @@ funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selecte
 /*ctx.lineTo(end_x, end_y);
 ctx.stroke();
 */
-$.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    add_line(start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+
 }
 }
 
@@ -330,9 +332,9 @@ var painter = document.getElementById("fore_painter");
 funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle - Math.PI / 6), end_y - headlen * Math.sin(angle - Math.PI / 6), selected_color, selected_size]);
 funqueue.push([cur_line, end_x, end_y, end_x - headlen * Math.cos(angle + Math.PI / 6), end_y - headlen * Math.sin(angle + Math.PI / 6), selected_color, selected_size]);
 
-        $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size});
-    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle - Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle - Math.PI / 6)) + "/" + selected_color + "/" + selected_size});
-    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle + Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle + Math.PI / 6)) + "/" + selected_color + "/" + selected_size});
+        add_line(start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size);
+    add_line(end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle - Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle - Math.PI / 6)) + "/" + selected_color + "/" + selected_size);
+    add_line(end_x + "/" + end_y + "/" + (end_x - headlen * Math.cos(angle + Math.PI / 6)) + "/" +  (end_y - headlen * Math.sin(angle + Math.PI / 6)) + "/" + selected_color + "/" + selected_size);
 
 
     } else if (rectangle) {
@@ -341,10 +343,10 @@ funqueue.push([cur_line, end_x, start_y, end_x, end_y, selected_color, selected_
 funqueue.push([cur_line, end_x, end_y, start_x, end_y, selected_color, selected_size]);
 funqueue.push([cur_line, start_x, end_y, start_x, start_y, selected_color, selected_size]);
 
-    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + start_y + "/" + selected_color + "/" + selected_size});
-    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
-    $.ajax({url:"/add/" + cur_line + "/" + end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
-    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size});
+    add_line(start_x + "/" + start_y + "/" + end_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
+    add_line(end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line(end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line(start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
     } else if (line) {
 funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
@@ -355,8 +357,9 @@ ctx.lineTo(end_x, end_y);
 ctx.stroke();
 ctx.closePath();
 */
-    $.ajax({url:"/add/" + cur_line + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size});
+    add_line(start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
 }//else ctx.closePath();
+            new_shape();
 
     cur_line = undefined;
 

@@ -13,8 +13,17 @@
 <script type='text/javascript'  src="multidraw.js"></script>
 
 <script type="text/javascript">
+//////// DONT CHANGE THIS LINE
+  var client_id=0;
+//////// END DONT CHANGE THIS LINE
+  var sent_lines=0;
 
-
+  function add_line(l) {
+      $.ajax({url:"/add/" + client_id + "," + sent_lines + "/" + l});
+  }
+  function new_shape() {
+      sent_lines += 1;
+  }
 
 $(document).ready(function() {
   $("#clean").dblclick(clean);
