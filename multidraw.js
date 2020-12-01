@@ -23,11 +23,11 @@ function canvas_arrow(context, fromx, fromy, tox, toy, size) {
   var dy = toy - fromy;
   var angle = Math.atan2(dy, dx);
   context.moveTo(fromx, fromy);
-    context.lineTo(tox+(size>1), toy+(size>1));
-  context.moveTo(tox, toy);
-    context.lineTo((tox - headlen * Math.cos(angle - Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle - Math.PI / 6))|0);
-  context.moveTo(tox, toy);
-    context.lineTo((tox - headlen * Math.cos(angle + Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle + Math.PI / 6))|0);
+    context.lineTo(tox, toy);
+    context.moveTo((tox - headlen * Math.cos(angle - Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle - Math.PI / 6))|0);
+  context.lineTo(tox, toy);
+    context.moveTo((tox - headlen * Math.cos(angle + Math.PI / 6)) | 0, (toy - headlen * Math.sin(angle + Math.PI / 6))|0);
+  context.lineTo(tox, toy);
 }
 
 function done_read_lines(data)
@@ -81,13 +81,11 @@ function draw_line(l, painter, ctx)
             var font_size = l[3];
             ctx.font = font_size + "px Lucida Sans Unicode"; // selected_size
             ctx.fillStyle = "#" + l[2];
-            ctx.fillText(atob(l[7]), parseInt(l[4]), parseInt(l[5])+parseInt(font_size));
+            ctx.fillText(atob(l[6]), parseInt(l[4]), parseInt(l[5])+parseInt(font_size));
         }
     } else if (l[1] == "path") {
         var cur_spec = [l[0], l[2], l[3], parseInt(l[4]), parseInt(l[5])];
-        if (old_spec && cur_spec.toString() == old_spec.toString()) {
-            ctx.lineTo(parseInt(l[6]), parseInt(l[7]));
-        } else {
+        if (!old_spec || cur_spec.toString() != old_spec.toString()) {
             if (old_spec) {
                 ctx.stroke();
                 ctx.closePath();
@@ -97,9 +95,11 @@ function draw_line(l, painter, ctx)
             ctx.lineWidth = l[3];
             ctx.strokeStyle="#" + l[2];
             ctx.moveTo(parseInt(l[4]), parseInt(l[5]));
-            ctx.lineTo(parseInt(l[6]), parseInt(l[7]));
         }
-        old_spec = [l[0], l[2], l[3], parseInt(l[6]), parseInt(l[7])]
+        for (i = 6; i < l.length; i += 2) {
+            ctx.lineTo(parseInt(l[i]), parseInt(l[i+1]));
+        }
+        old_spec = [l[0], l[2], l[3], parseInt(l[i]), parseInt(l[i+1])]
     }
 }
 
@@ -163,8 +163,8 @@ end_y = start_y = e.offsetY;
         inp = window.prompt("");
         if (inp) {
 
-            funqueue.push([cur_line, "text", selected_color, selected_size, start_x, start_y, "20", btoa(inp), ]);
-            add_line("text" + "/" + selected_color + "/" + selected_size + "/" + start_x + "/" + start_y + "/" + "20" + "/" + btoa(inp));
+            funqueue.push([cur_line, "text", selected_color, "20", start_x, start_y, btoa(inp), ]);
+            add_line("text" + "/" + selected_color + "/" + "20" + "/" + start_x + "/" + start_y + "/" + btoa(inp));
             new_shape();
 
         }
@@ -362,25 +362,36 @@ var painter = document.getElementById("fore_painter");
   var dx = end_x - start_x;
   var dy = end_y - start_y;
   var angle = Math.atan2(dy, dx);
-        funqueue.push([cur_line, "path", selected_color, selected_size, start_x, start_y, end_x+(selected_size>1), end_y+(selected_size>1), ]);
-        funqueue.push([cur_line, "path", selected_color, selected_size, end_x, end_y, (end_x - headlen * Math.cos(angle - Math.PI / 6))|0, (end_y - headlen * Math.sin(angle - Math.PI / 6))|0, ]);
-        funqueue.push([cur_line, "path", selected_color, selected_size, end_x, end_y, (end_x - headlen * Math.cos(angle + Math.PI / 6))|0, (end_y - headlen * Math.sin(angle + Math.PI / 6))|0, ]);
+        funqueue.push([cur_line, "path", selected_color, selected_size,
+                       start_x, start_y, end_x, end_y]);
+        funqueue.push([cur_line, "path", selected_color, selected_size,
+                       (end_x - headlen * Math.cos(angle - Math.PI / 6))|0, (end_y - headlen * Math.sin(angle - Math.PI / 6))|0, end_x, end_y]);
+        funqueue.push([cur_line, "path", selected_color, selected_size,
+                       (end_x - headlen * Math.cos(angle + Math.PI / 6))|0, (end_y - headlen * Math.sin(angle + Math.PI / 6))|0, end_x, end_y]);
 
-        add_line("path" + "/" + selected_color + "/" + selected_size + "/" + start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)));
-        add_line("path" + "/" + selected_color + "/" + selected_size + "/" + end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle - Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle - Math.PI / 6))|0));
-        add_line("path" + "/" + selected_color + "/" + selected_size + "/" + end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle + Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle + Math.PI / 6))|0));
-
+        add_line("path" + "/" + selected_color + "/" + selected_size + "/" +
+                 start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/");
+        add_line("path" + "/" + selected_color + "/" + selected_size + "/" +
+                 ((end_x - headlen * Math.cos(angle - Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle - Math.PI / 6))|0) + "/" +
+                 end_x + "/" + end_y);
+        add_line("path" + "/" + selected_color + "/" + selected_size + "/" +
+                 ((end_x - headlen * Math.cos(angle + Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle + Math.PI / 6))|0) + "/" +
+                 end_x + "/" + end_y);
 
     } else if (rectangle) {
-        funqueue.push([cur_line, "path", selected_color, selected_size, start_x, start_y, end_x, start_y, ]);
-        funqueue.push([cur_line, "path", selected_color, selected_size, end_x, start_y, end_x, end_y, ]);
-        funqueue.push([cur_line, "path", selected_color, selected_size, end_x, end_y, start_x, end_y, ]);
-        funqueue.push([cur_line, "path", selected_color, selected_size, start_x, end_y, start_x, start_y, ]);
+        funqueue.push([cur_line, "path", selected_color, selected_size,
+                       start_x, start_y,
+                       end_x, start_y,
+                       end_x, end_y,
+                       start_x, end_y,
+                       start_x, start_y, ]);
 
-    add_line("path" + "/" + selected_color + "/" + selected_size + "/" + start_x + "/" + start_y + "/" + end_x + "/" + start_y);
-    add_line("path" + "/" + selected_color + "/" + selected_size + "/" + end_x + "/" + start_y + "/" + end_x + "/" + end_y);
-    add_line("path" + "/" + selected_color + "/" + selected_size + "/" + end_x + "/" + end_y + "/" + start_x + "/" + end_y);
-    add_line("path" + "/" + selected_color + "/" + selected_size + "/" + start_x + "/" + end_y + "/" + start_x + "/" + start_y);
+        add_line("path" + "/" + selected_color + "/" + selected_size + "/" +
+                 start_x + "/" + start_y + "/" +
+                 end_x + "/" + start_y + "/" +
+                 end_x + "/" + end_y + "/" +
+                 start_x + "/" + end_y + "/" +
+                 start_x + "/" + start_y + "/");
     } else if (line) {
 funqueue.push([cur_line, "path", selected_color, selected_size, start_x, start_y, end_x, end_y]);
 /*ctx.beginPath();
