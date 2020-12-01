@@ -68,25 +68,25 @@ var old_spec;
 function draw_line(l, painter, ctx)
 {
 
-    if (l[7] == "text" || l[7] == "block") {
+    if (l[1] == "text" || l[1] == "block") {
         if (old_spec) {
             ctx.stroke();
             ctx.closePath();
             old_spec = undefined;
         }
-        if (l[7] == "block") {
-            ctx.fillStyle="#" + l[5];
-            ctx.fillRect(parseInt(l[1]), parseInt(l[2]), parseInt(l[3])-parseInt(l[1]), parseInt(l[4])-parseInt(l[2]));
-        } else if (l[7] == "text") {
-            var font_size = l[3];
+        if (l[1] == "block") {
+            ctx.fillStyle="#" + l[6];
+            ctx.fillRect(parseInt(l[2]), parseInt(l[3]), parseInt(l[4])-parseInt(l[2]), parseInt(l[5])-parseInt(l[3]));
+        } else if (l[1] == "text") {
+            var font_size = l[4];
             ctx.font = font_size + "px Lucida Sans Unicode"; // selected_size
-            ctx.fillStyle = "#" + l[5];
-            ctx.fillText(atob(l[4]), parseInt(l[1]), parseInt(l[2])+parseInt(font_size));
+            ctx.fillStyle = "#" + l[6];
+            ctx.fillText(atob(l[5]), parseInt(l[2]), parseInt(l[3])+parseInt(font_size));
         }
     } else {
-        var cur_spec = [parseInt(l[1]), parseInt(l[2]), l[5], l[6], l[0]];
+        var cur_spec = [l[0], parseInt(l[2]), parseInt(l[3]), l[6], l[7]];
         if (old_spec && cur_spec.toString() == old_spec.toString()) {
-            ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
+            ctx.lineTo(parseInt(l[4]), parseInt(l[5]));
         } else {
             if (old_spec) {
                 ctx.stroke();
@@ -94,12 +94,12 @@ function draw_line(l, painter, ctx)
             }
             ctx.beginPath();
             ctx.lineCap = "round";
-            ctx.lineWidth = l[6];
-            ctx.strokeStyle="#" + l[5];
-            ctx.moveTo(parseInt(l[1]), parseInt(l[2]));
-            ctx.lineTo(parseInt(l[3]), parseInt(l[4]));
+            ctx.lineWidth = l[7];
+            ctx.strokeStyle="#" + l[6];
+            ctx.moveTo(parseInt(l[2]), parseInt(l[3]));
+            ctx.lineTo(parseInt(l[4]), parseInt(l[5]));
         }
-        old_spec = [parseInt(l[3]), parseInt(l[4]), l[5], l[6], l[0]]
+        old_spec = [l[0], parseInt(l[4]), parseInt(l[5]), l[6], l[7]]
     }
 }
 
@@ -163,8 +163,8 @@ end_y = start_y = e.offsetY;
         inp = window.prompt("");
         if (inp) {
 
-            funqueue.push([cur_line, start_x, start_y, "20", btoa(inp), selected_color, selected_size]);
-            add_line(start_x + "/" + start_y + "/" + "20" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size + "/" + "text");
+            funqueue.push([cur_line, "text", start_x, start_y, "20", btoa(inp), selected_color, selected_size]);
+            add_line("text" + "/" + start_x + "/" + start_y + "/" + "20" + "/" + btoa(inp) + "/" + selected_color + "/" + selected_size);
             new_shape();
 
         }
@@ -330,11 +330,11 @@ else
 end_x = e.offsetX;
 end_y = e.offsetY;
 }
-funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.lineTo(end_x, end_y);
 ctx.stroke();
 */
-    add_line(start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
 
 }
 }
@@ -355,34 +355,34 @@ var painter = document.getElementById("fore_painter");
     clear_all(painter, ctx);
 
     if (block) {
-        funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size, "block"]);
-        add_line(start_x + "/" + start_y + "/" + end_x + "/" +  end_y + "/" + selected_color + "/" + selected_size + "/" + "block");
+        funqueue.push([cur_line, "block", start_x, start_y, end_x, end_y, selected_color, selected_size]);
+        add_line("block" + "/" + start_x + "/" + start_y + "/" + end_x + "/" +  end_y + "/" + selected_color + "/" + selected_size);
     } else if (arrow) {
         var headlen = 3*Math.max(selected_size, arrow_min_size); // length of head in pixels
   var dx = end_x - start_x;
   var dy = end_y - start_y;
   var angle = Math.atan2(dy, dx);
-        funqueue.push([cur_line, start_x, start_y, end_x+(selected_size>1), end_y+(selected_size>1), selected_color, selected_size]);
-        funqueue.push([cur_line, end_x, end_y, (end_x - headlen * Math.cos(angle - Math.PI / 6))|0, (end_y - headlen * Math.sin(angle - Math.PI / 6))|0, selected_color, selected_size]);
-        funqueue.push([cur_line, end_x, end_y, (end_x - headlen * Math.cos(angle + Math.PI / 6))|0, (end_y - headlen * Math.sin(angle + Math.PI / 6))|0, selected_color, selected_size]);
+        funqueue.push([cur_line, "path", start_x, start_y, end_x+(selected_size>1), end_y+(selected_size>1), selected_color, selected_size]);
+        funqueue.push([cur_line, "path", end_x, end_y, (end_x - headlen * Math.cos(angle - Math.PI / 6))|0, (end_y - headlen * Math.sin(angle - Math.PI / 6))|0, selected_color, selected_size]);
+        funqueue.push([cur_line, "path", end_x, end_y, (end_x - headlen * Math.cos(angle + Math.PI / 6))|0, (end_y - headlen * Math.sin(angle + Math.PI / 6))|0, selected_color, selected_size]);
 
-        add_line(start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size);
-        add_line(end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle - Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle - Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
-        add_line(end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle + Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle + Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
+        add_line("path" + "/" + start_x + "/" + start_y + "/" + (end_x+(selected_size>1)) + "/" + (end_y+(selected_size>1)) + "/" + selected_color + "/" + selected_size);
+        add_line("path" + "/" + end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle - Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle - Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
+        add_line("path" + "/" + end_x + "/" + end_y + "/" + ((end_x - headlen * Math.cos(angle + Math.PI / 6))|0) + "/" +  ((end_y - headlen * Math.sin(angle + Math.PI / 6))|0) + "/" + selected_color + "/" + selected_size);
 
 
     } else if (rectangle) {
-funqueue.push([cur_line, start_x, start_y, end_x, start_y, selected_color, selected_size]);
-funqueue.push([cur_line, end_x, start_y, end_x, end_y, selected_color, selected_size]);
-funqueue.push([cur_line, end_x, end_y, start_x, end_y, selected_color, selected_size]);
-funqueue.push([cur_line, start_x, end_y, start_x, start_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", start_x, start_y, end_x, start_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", end_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", end_x, end_y, start_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", start_x, end_y, start_x, start_y, selected_color, selected_size]);
 
-    add_line(start_x + "/" + start_y + "/" + end_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
-    add_line(end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
-    add_line(end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
-    add_line(start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + start_x + "/" + start_y + "/" + end_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + end_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + end_x + "/" + end_y + "/" + start_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + start_x + "/" + end_y + "/" + start_x + "/" + start_y + "/" + selected_color + "/" + selected_size);
     } else if (line) {
-funqueue.push([cur_line, start_x, start_y, end_x, end_y, selected_color, selected_size]);
+funqueue.push([cur_line, "path", start_x, start_y, end_x, end_y, selected_color, selected_size]);
 /*ctx.beginPath();
 ctx.lineCap = "round";
 ctx.strokeStyle="#" + selected_color;
@@ -391,7 +391,7 @@ ctx.lineTo(end_x, end_y);
 ctx.stroke();
 ctx.closePath();
 */
-    add_line(start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
+    add_line("path" + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y + "/" + selected_color + "/" + selected_size);
 }//else ctx.closePath();
             new_shape();
 
