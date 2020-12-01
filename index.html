@@ -19,7 +19,11 @@
   var sent_lines=0;
 
   function add_line(l) {
-      $.ajax({url:"/add/" + client_id + "," + sent_lines + "/" + l});
+      var start_time = performance.now();
+      $.ajax({url:"/add/" + client_id + "," + sent_lines + "/" + l, complete: ()=> {
+          var end_time = performance.now();
+          brushtime = (2 * (end_time - start_time) + 8 * brushtime) / 10;
+      }});
   }
   function new_shape() {
       sent_lines += 1;
@@ -249,7 +253,7 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 <span id='MyDemoColorPicker1'  style="float: left;clear:left; padding-top: 10px; "></span>
 
 <div class="radio-toolbar" style="clear: left; padding-top: 9px;">
-  <input type='radio' id='radio_6' name="type" value='brush' style="float: right;" /><label for="radio_6" style="float: right;">block<sub style="font-size:10px; ">6</sub></label>
+  <input type='radio' id='radio_6' name="type" value='block' style="float: right;" /><label for="radio_6" style="float: right;">block<sub style="font-size:10px; ">6</sub></label>
   <input type='radio' id='radio_2' name="type" value='brush' style="float: right;" /><label for="radio_2" style="float: right;">brush<sub style="font-size:10px; ">5</sub></label>
   <input type='radio' id='radio_1' name="type" value='line' style="float: right;"/><label for="radio_1" style="float: right;">line<sub style="font-size:10px; ">4</sub></label>
   <input type='radio' id='radio_5' name="type" value='text' style="float: right;"/><label for="radio_5" style="float: right;">text<sub style="font-size:10px; ">3</sub></label>

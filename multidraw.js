@@ -10,6 +10,7 @@ function undo () {
 
 var deltime = 100;
 var draw_deltime = 30;
+var brushtime = 15;
 
 var selected_color = "000000";
 var selected_size = 1;
@@ -145,6 +146,8 @@ var start_x = 0;
 var start_y = 0;
 var painter = document.getElementById("painter");
 var cur_line = null;
+var brush_vectors;
+var brush_timer;
 function startline(e)
 {
 if (navigator.userAgent.indexOf("Firefox")!=-1)
@@ -159,6 +162,7 @@ end_y = start_y = e.offsetY;
 }
     cur_line = lines_count;
         var istext = $("#radio_5").attr('checked');
+        var isbrush = $("#radio_2").attr('checked');
     if (istext) {
         inp = window.prompt("");
         if (inp) {
@@ -171,6 +175,11 @@ end_y = start_y = e.offsetY;
         cur_line = undefined;
 
         return;
+    }
+    else if (isbrush) {
+        brush_vectors = [[start_x, start_y]];
+        prev_last_sent = undefined;
+        brush_timer = setTimeout(paint_brush, brushtime);
     }
 var painter = document.getElementById("fore_painter");
 painter.onmousemove = moveline;
@@ -330,13 +339,35 @@ else
 end_x = e.offsetX;
 end_y = e.offsetY;
 }
-    funqueue.push([cur_line, "path", selected_color, selected_size, start_x, start_y, end_x, end_y, ]);
-/*ctx.lineTo(end_x, end_y);
-ctx.stroke();
-*/
-    add_line("path" + "/" + selected_color + "/" + selected_size + "/" + start_x + "/" + start_y + "/" + end_x + "/" + end_y);
-
+    funqueue.push([cur_line, "path", selected_color, selected_size, start_x, start_y, end_x, end_y]);
+    brush_vectors.push([end_x, end_y]);
 }
+}
+
+var prev_last_sent;
+function paint_brush(set_timer=true) {
+    if (brush_vectors.length > 0) {
+        to_send = "path" + "/" + selected_color + "/" + selected_size;
+        var prev_len = brush_vectors.length;
+        var added = brush_vectors.length > 1;
+        while (brush_vectors.length > 1) {
+            d = brush_vectors.shift();
+            to_send = to_send + "/" + d[0] + "/" + d[1]
+        }
+        d = brush_vectors[0];
+        if (typeof prev_last_sent === "undefined" || prev_last_sent.toString() != d.toString() || prev_len != 1) {
+            prev_last_sent = d;
+            to_send = to_send + "/" + d[0] + "/" + d[1];
+            added = true;
+        }
+
+        if (added) {
+            add_line(to_send);
+        }
+    }
+    if (set_timer) {
+        brush_timer = setTimeout(paint_brush, brushtime);
+    }
 }
 
 function endline()
@@ -348,13 +379,20 @@ var ctx = painter.getContext("2d");
     var rectangle=$("#radio_3").attr('checked');
     var arrow=$("#radio_4").attr('checked');
     var block=$("#radio_6").attr('checked');
+    var isbrush = $("#radio_2").attr('checked');
 
 var painter = document.getElementById("fore_painter");
     painter.onmousemove = null;
     var ctx = painter.getContext("2d");
     clear_all(painter, ctx);
 
-    if (block) {
+    if (isbrush) {
+        clearTimeout(brush_timer);
+        prev_last_sent = undefined;
+        brush_timer = undefined;
+        paint_brush(false);
+
+    } else if (block) {
         funqueue.push([cur_line, "block", selected_color, start_x, start_y, end_x, end_y, ]);
         add_line("block" + "/" + selected_color + "/" + start_x + "/" + start_y + "/" + end_x + "/" +  end_y);
     } else if (arrow) {
