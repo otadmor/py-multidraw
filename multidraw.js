@@ -448,7 +448,7 @@ ctx.closePath();
             new_shape();
 
     cur_line = undefined;
-
+    window.setTimeout("draw_lines()", 0);
 }
 
 
