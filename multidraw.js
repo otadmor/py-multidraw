@@ -57,7 +57,7 @@ var l = lines[line];
 funqueue.push(l);
 
 }
-window.setTimeout("read_lines()", deltime);
+window.setTimeout(read_lines, deltime);
 }
 
 function clear_all(painter, ctx)
@@ -107,29 +107,56 @@ function draw_line(l, painter, ctx)
     }
 }
 
+var doubleBuffer = false;
+var tempCanvas;
+if (doubleBuffer) {
+    tempCanvas = document.createElement('canvas');
+    $(document).ready(function() {
+        tempCanvas.width = screen.width;
+        tempCanvas.height = screen.height;
+        tempCanvas.style = "position: absolute; left: 0; top: 0; background-color: transparent;z-index:-100; display: none;";
+        document.body.appendChild(tempCanvas);
+    });
+}
 function draw_all_lines()
 {
     var painter = document.getElementById("painter");
     var ctx = painter.getContext("2d");
+    var tempCtx;
+    if (doubleBuffer) {
+        tempCtx = tempCanvas.getContext('2d');
+        clear_all(tempCanvas, tempCtx);
+    } else {
+        tempCtx = ctx;
+    }
+    var cleared = false;
 
     old_spec = undefined;
     while (funqueue.length > 0) {
         d = funqueue.shift();
         if (d == null) {
             if (old_spec) {
-                ctx.stroke();
-                ctx.closePath();
+                tempCtx.stroke();
+                tempCtx.closePath();
                 old_spec = undefined;
             }
-            clear_all(painter, ctx);
+            clear_all(painter, tempCtx);
+            cleared = true;
         }
-        else draw_line(d, painter, ctx);
+        else draw_line(d, painter, tempCtx);
     }
     if (old_spec) {
-        ctx.stroke();
-        ctx.closePath();
+        tempCtx.stroke();
+        tempCtx.closePath();
         old_spec = undefined;
     }
+
+    if (doubleBuffer) {
+        if (cleared) ctx.putImageData(tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height), 0, 0);
+        else ctx.drawImage(tempCanvas, 0, 0);
+    }
+
+
     window.requestAnimationFrame(draw_all_lines);
 }
 window.requestAnimationFrame(draw_all_lines);
@@ -144,7 +171,7 @@ function read_lines() {
 
 var start_x = 0;
 var start_y = 0;
-var painter = document.getElementById("painter");
+// var painter = document.getElementById("painter");
 var cur_line = null;
 var brush_vectors;
 var brush_timer;
@@ -372,8 +399,6 @@ function paint_brush(set_timer=true) {
 
 function endline()
 {
-var painter = document.getElementById("painter");
-var ctx = painter.getContext("2d");
     var line = $("#radio_1").attr('checked');
     var cont = $("#radio_2").attr('checked');
     var rectangle=$("#radio_3").attr('checked');
