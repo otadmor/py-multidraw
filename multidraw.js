@@ -109,35 +109,32 @@ function draw_line(l, painter, ctx)
 
 function draw_all_lines()
 {
-var painter = document.getElementById("painter");
-var ctx = painter.getContext("2d");
+    var painter = document.getElementById("painter");
+    var ctx = painter.getContext("2d");
 
     old_spec = undefined;
-while (funqueue.length > 0) {
-    d = funqueue.shift();
-    if (d == null) {
-        if (old_spec) {
-            ctx.stroke();
-            ctx.closePath();
-            old_spec = undefined;
+    while (funqueue.length > 0) {
+        d = funqueue.shift();
+        if (d == null) {
+            if (old_spec) {
+                ctx.stroke();
+                ctx.closePath();
+                old_spec = undefined;
+            }
+            clear_all(painter, ctx);
         }
-        clear_all(painter, ctx);
+        else draw_line(d, painter, ctx);
     }
-    else draw_line(d, painter, ctx);
-}
     if (old_spec) {
         ctx.stroke();
         ctx.closePath();
+        old_spec = undefined;
     }
-    old_spec = undefined;
+    window.requestAnimationFrame(draw_all_lines);
 }
+window.requestAnimationFrame(draw_all_lines);
 
 
-function draw_lines()
-{
-draw_all_lines();
-window.setTimeout("draw_lines()", draw_deltime);
-}
 
 function read_lines() {
   $.ajax({url:"/" + (last_index + lines_painted)}).done(done_read_lines);
@@ -448,7 +445,6 @@ ctx.closePath();
             new_shape();
 
     cur_line = undefined;
-    window.setTimeout("draw_lines()", 0);
 }
 
 
