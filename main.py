@@ -10,6 +10,7 @@ import json
 #static_page = open("index.html", "rt").read()
 #jquery_page = open("jquery.min.js", "rt").read()
 lines = []
+redo = []
 lines_index = 0
 
 allowed_files = ["multidraw.js","sgbeal-colorpicker.jquery.js", "jquery.min.js", "jquery.nouislider.min.js"]
@@ -30,6 +31,7 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
     def do_GET(self):
         global lines_index
         global lines
+        global redo
         global clients
 
         if self.path[1:].isdigit():
@@ -42,6 +44,7 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
         elif self.path.startswith('/add'):
             coords = [a for a in self.path[len('/add/'):].split('/')]
             lines.append(coords)
+            redo = []
             self.myheaders()
             self.wfile.write(b"")
         elif self.path.startswith('/clean'):
@@ -51,20 +54,27 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
             self.wfile.write(b"")
         elif self.path.startswith('/save/'):
             p = self.path[len('/save/'):].replace('.','_').replace('/', '_').replace('\\', '_')
-            pickle.dump(lines, open(p + '.pkl', 'wb'))
+            pickle.dump((clients, lines, redo), open(p + '.pkl', 'wb'))
             self.myheaders()
             self.wfile.write(b"")
         elif self.path.startswith('/load/'):
             p = self.path[len('/load/'):].replace('.','_').replace('/', '_').replace('\\', '_')
             lines_index = 0
-            lines = pickle.load(open(p + '.pkl', 'rb'))
+            clients, lines, redo = pickle.load(open(p + '.pkl', 'rb'))
             self.myheaders()
             self.wfile.write(b"")
         elif self.path.startswith('/undo'):
             if len(lines) != 0:
                 remove_index = lines[len(lines) - 1][0]
+                redo.extend(l for l in lines if l[0] == remove_index)
                 lines = [l for l in lines if l[0] != remove_index]
-                # del lines[len(lines) - 1]
+            self.myheaders()
+            self.wfile.write(b"")
+        elif self.path.startswith('/redo'):
+            if len(redo) != 0:
+                readd_index = redo[len(redo) - 1][0]
+                lines.extend(l for l in redo if l[0] == readd_index)
+                redo = [l for l in redo if l[0] != readd_index]
             self.myheaders()
             self.wfile.write(b"")
         elif self.path == '/':
@@ -89,8 +99,9 @@ class CompGeoRequestHandler(CGIHTTPRequestHandler):
 def start_server(port):
     global lines
     global clients
+    global redo
     try:
-        clients, lines = pickle.load(open('objects.pkl', "rb"))
+        clients, lines, redo = pickle.load(open('objects.pkl', "rb"))
     except:
         lines = []
 
@@ -100,7 +111,7 @@ def start_server(port):
     try:
         server.serve_forever()
     except:
-        pickle.dump((clients, lines), open('objects.pkl', 'wb'))
+        pickle.dump((clients, lines, redo), open('objects.pkl', 'wb'))
 
 
 

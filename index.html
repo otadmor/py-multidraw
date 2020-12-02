@@ -32,6 +32,7 @@
 $(document).ready(function() {
   $("#clean").dblclick(clean);
   $("#undo").click(undo);
+  $("#redo").click(redo);
 
 var w = screen.width;
 var h = screen.height;
@@ -91,6 +92,8 @@ document.onkeyup = function(e) {
     $("#radio_5").attr('checked', 'checked');
     } else if (e.ctrlKey && e.which == 90) {
         undo();
+    } else if (e.ctrlKey && e.which == 89) {
+        redo();
     }
 
 }
@@ -247,8 +250,9 @@ input {-webkit-user-select: text; -khtml-user-select: text; -moz-user-select: -m
 <a id="imagelink" class="link_button" target="_blank" style="float: left;">link</a>
 <a id="clean" class="link_button"  style="float: left;" href="#">clean</a>
 <a id="undo" class="link_button"  style="float: left;" href="#">undo</a>
+<a id="redo" class="link_button"  style="float: left;" href="#">redo</a>
 
-<div id="size-slider" style="float: left; left:10px; top:12px; width: 300px;"  class="sliderbar"></div>
+<div id="size-slider" style="float: left; left:10px; top:12px; width: 245px;"  class="sliderbar"></div>
 
 <span id='MyDemoColorPicker1'  style="float: left;clear:left; padding-top: 10px; "></span>
 

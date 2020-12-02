@@ -1,11 +1,14 @@
 
 function clean () {
   $.ajax({url:"/clean"});
-
 }
+
 function undo () {
   $.ajax({url:"/undo"});
+}
 
+function redo () {
+  $.ajax({url:"/redo"});
 }
 
 var deltime = 100;
